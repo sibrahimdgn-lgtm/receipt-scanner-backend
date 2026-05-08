@@ -43,15 +43,17 @@ It extracts:
 Create `.env` from `.env.example` and set:
 - `GEMINI_API_KEY`
 - `FIREBASE_STORAGE_BUCKET`
-- `GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json` for the local service account file
+- `FIREBASE_SERVICE_ACCOUNT` with the full JSON service account payload for hosted environments like Render
 - one Firebase Admin credential strategy:
+  - `FIREBASE_SERVICE_ACCOUNT`, or
   - `FIREBASE_SERVICE_ACCOUNT_JSON`, or
   - `FIREBASE_PROJECT_ID` + `FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY`, or
-  - `GOOGLE_APPLICATION_CREDENTIALS` in your shell
+  - `GOOGLE_APPLICATION_CREDENTIALS` in your shell for local file-based development
 - optional `PORT`
 
 At startup the API now validates:
-- `firebase-service-account.json` can be resolved from `GOOGLE_APPLICATION_CREDENTIALS`
+- `FIREBASE_SERVICE_ACCOUNT` JSON is parseable when present
+- `firebase-service-account.json` can be resolved from `GOOGLE_APPLICATION_CREDENTIALS` when using a local file
 - the local `uploads/` directory exists and is writable
 - Firebase Admin and Gemini config status are printed to the server console
 

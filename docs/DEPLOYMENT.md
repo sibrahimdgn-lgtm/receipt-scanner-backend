@@ -13,8 +13,10 @@
 Required:
 - `GEMINI_API_KEY`
 - `FIREBASE_STORAGE_BUCKET`
+- preferred hosted setup: `FIREBASE_SERVICE_ACCOUNT=<single-line JSON>`
 - local default key path: `GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json`
 - one of:
+  - `FIREBASE_SERVICE_ACCOUNT`
   - `FIREBASE_SERVICE_ACCOUNT_JSON`
   - `FIREBASE_PROJECT_ID` + `FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY`
   - `GOOGLE_APPLICATION_CREDENTIALS`
@@ -23,6 +25,7 @@ Optional:
 - `PORT`
 
 Startup checks now validate that:
+- `FIREBASE_SERVICE_ACCOUNT` parses as valid JSON when present
 - `GOOGLE_APPLICATION_CREDENTIALS` resolves to a readable `firebase-service-account.json`
 - the local `uploads/` fallback directory exists and is writable
 - Firebase Admin and Gemini config status are printed to the API console

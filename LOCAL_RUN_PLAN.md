@@ -1737,3 +1737,22 @@ Yeni oturumda once bu dosya okunacak, sonra bir sonraki `Durum: bekliyor` veya `
     - kasitli gecersiz bucket adi ile `uploadReceiptBuffer()` cagrildi
     - upload hatasi loglandi ama dosya `local:shops/...` path'i ve `http://127.0.0.1:3000/uploads/...` URL'i ile yerel fallback'e dustu
     - temp local dosya silindi
+
+## 2026-05-08 - Render Firebase Service Account Env Bootstrap
+
+- Problem:
+  - Render ortaminda `firebase-service-account.json` dosyasi bulunmadigi icin file-path tabanli Admin bootstrap kiriliyordu.
+  - Hosted deploy tarafinda service account bilgisinin tek satir JSON env degiskeni olarak verilmesi gerekiyor.
+- Duzeltme:
+  - `src/config/firebaseAdmin.js` artik once `FIREBASE_SERVICE_ACCOUNT` env degiskenini parse ediyor.
+  - `FIREBASE_SERVICE_ACCOUNT` gecersiz JSON ise net hata mesaji veriyor.
+  - Legacy uyumluluk icin `FIREBASE_SERVICE_ACCOUNT_JSON`, field-based env'ler ve local `GOOGLE_APPLICATION_CREDENTIALS` fallback'i korunuyor.
+  - Diagnostics alaninda hangi credential kaynaginin kullanildigi (`env_firebase_service_account`, `google_application_credentials` vb.) artik gorunuyor.
+  - `.env.example`, `README.md` ve `docs/DEPLOYMENT.md` Render icin yeni tercih edilen env anahtarini gosterecek sekilde guncellendi.
+- Dogrulama:
+  - `node -c src/config/firebaseAdmin.js`
+  - `node --test test/*.test.js`
+  - Env smoke testi:
+    - `FIREBASE_SERVICE_ACCOUNT` tek satir JSON olarak verildi
+    - `getFirebaseAdminDiagnostics().credentialSource === 'env_firebase_service_account'`
+    - `hasFirebaseAdminConfig() === true`

@@ -6,16 +6,41 @@ const admin = require('firebase-admin');
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 function parseServiceAccountJson() {
-  if (!process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    return null;
-  }
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT?.trim();
 
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON.trim();
   if (!raw) {
     return null;
   }
 
-  return JSON.parse(raw);
+  try {
+    const serviceAccount = JSON.parse(raw);
+    return serviceAccount && typeof serviceAccount === 'object'
+      ? serviceAccount
+      : null;
+  } catch (error) {
+    throw new Error(
+      `FIREBASE_SERVICE_ACCOUNT is not valid JSON: ${error.message}`
+    );
+  }
+}
+
+function parseLegacyServiceAccountJson() {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
+
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const serviceAccount = JSON.parse(raw);
+    return serviceAccount && typeof serviceAccount === 'object'
+      ? serviceAccount
+      : null;
+  } catch (error) {
+    throw new Error(
+      `FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: ${error.message}`
+    );
+  }
 }
 
 function buildServiceAccountFromEnv() {
@@ -37,7 +62,11 @@ function buildServiceAccountFromEnv() {
 }
 
 function getServiceAccount() {
-  return parseServiceAccountJson() || buildServiceAccountFromEnv();
+  return (
+    parseServiceAccountJson()
+    || parseLegacyServiceAccountJson()
+    || buildServiceAccountFromEnv()
+  );
 }
 
 function getGoogleApplicationCredentialsPath() {
@@ -82,7 +111,7 @@ function ensureFirebaseAdmin() {
   if (!serviceAccount) {
     if (!credentialsPath) {
       throw new Error(
-        'Firebase Admin is not configured. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY, or provide GOOGLE_APPLICATION_CREDENTIALS.'
+        'Firebase Admin is not configured. Set FIREBASE_SERVICE_ACCOUNT (preferred on Render), FIREBASE_SERVICE_ACCOUNT_JSON, FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY, or provide GOOGLE_APPLICATION_CREDENTIALS.'
       );
     }
   }
@@ -128,7 +157,13 @@ function getFirebaseAdminDiagnostics() {
     credentialsPath,
     credentialsPathExists: credentialsPath ? fs.existsSync(credentialsPath) : false,
     credentialSource: serviceAccount
-      ? 'env_service_account'
+      ? (
+        process.env.FIREBASE_SERVICE_ACCOUNT?.trim()
+          ? 'env_firebase_service_account'
+          : process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim()
+            ? 'env_firebase_service_account_json'
+            : 'env_service_account_fields'
+      )
       : credentialsPath
         ? 'google_application_credentials'
         : 'missing',
