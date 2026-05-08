@@ -1,0 +1,74 @@
+-- Receipt Scanner Firebase Data Model
+-- This repository no longer uses PostgreSQL as the runtime source of truth.
+-- The old SQL schema has been replaced by Firebase Auth, Firestore, and
+-- Firebase Cloud Storage. This file now documents the canonical NoSQL model.
+
+-- ── Collections ─────────────────────────────────────────────
+--
+-- shops/{shopId}
+-- {
+--   shop_id: string,
+--   name: string,
+--   email: string | null,
+--   currency: string,                 -- ISO 4217, default TRY
+--   owner_user_id: string,            -- Firebase Auth UID
+--   created_at: Firestore Timestamp,
+--   updated_at: Firestore Timestamp
+-- }
+--
+-- users/{firebaseUid}
+-- {
+--   user_id: string,                  -- same as Firebase Auth UID
+--   shop_id: string,                  -- tenant root
+--   email: string | null,
+--   preferred_language: string,       -- tr | en | de | ar
+--   created_at: Firestore Timestamp,
+--   updated_at: Firestore Timestamp
+-- }
+--
+-- receipts/{receiptId}
+-- {
+--   receipt_id: string,
+--   shop_id: string,
+--   user_id: string,
+--   vendor_name: string,
+--   receipt_date: string | null,      -- YYYY-MM-DD
+--   scanned_image_url: string | null, -- Firebase Storage download URL
+--   scanned_image_path: string | null,-- bucket-relative path
+--   original_filename: string | null,
+--   mime_type: string | null,
+--   currency_code: string,            -- ISO 4217
+--   currency_symbol: string | null,
+--   currency_source: string,          -- model / shop_default / manual_override
+--   currency_confidence: number,
+--   total_amount: number,
+--   tax_amount: number,
+--   item_count: number,
+--   line_items: [
+--     {
+--       line_item_id: string,
+--       item_name: string,
+--       transaction_date: string | null, -- YYYY-MM-DD
+--       quantity: number,
+--       unit_price: number,
+--       total_price: number,
+--       category: string               -- canonical category key
+--     }
+--   ],
+--   created_at: Firestore Timestamp,
+--   updated_at: Firestore Timestamp
+-- }
+--
+-- ── Storage Layout ──────────────────────────────────────────
+--
+-- gs://<FIREBASE_STORAGE_BUCKET>/shops/{shopId}/receipts/{timestamp}-{userId}-{filename}
+--
+-- Files are uploaded from the Express API using multer memory storage and then
+-- persisted to Firebase Cloud Storage. The generated download URL is stored in
+-- `receipts.scanned_image_url`.
+--
+-- ── Auth Notes ──────────────────────────────────────────────
+--
+-- Flutter performs register/login directly with Firebase Auth and sends the
+-- Firebase ID token to the backend. Express verifies that token with
+-- `firebase-admin` and uses the decoded UID as the canonical user identity.

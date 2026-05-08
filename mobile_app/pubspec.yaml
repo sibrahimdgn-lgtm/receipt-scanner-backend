@@ -1,0 +1,36 @@
+name: receipt_scanner_app
+description: Multi-tenant receipt scanning mobile app powered by Gemini AI.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  file_picker: ^10.3.2
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
+  http: ^1.2.0
+  http_parser: ^4.1.2
+  google_fonts: ^6.2.0
+  fl_chart: ^1.2.0
+  intl: ^0.20.2
+  shared_preferences: ^2.5.5
+  firebase_core: ^4.7.0
+  firebase_auth: ^6.4.0
+  cloud_firestore: ^6.3.0
+  firebase_storage: ^13.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
