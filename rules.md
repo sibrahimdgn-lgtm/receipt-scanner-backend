@@ -1,6 +1,6 @@
 # Engineering Rules
 
-Last updated: 2026-04-19
+Last updated: 2026-05-09
 Status: Active
 
 ## Purpose
@@ -50,7 +50,7 @@ Do not move on until the scope is clear.
 ### PLAN `/plan`
 
 Decide:
-- whether the change belongs on `main` or a task branch
+- how the change will land safely on `main`
 - the canonical implementation point
 - which code, docs, and tests must move together
 - how the change will be verified
@@ -88,7 +88,7 @@ Do not move on until the staged change is coherent, documented, and reversible.
 
 ### SHIP `/ship`
 
-Commit and merge only:
+Ship only:
 - intended files
 - from a clean worktree
 - with an exact report of what changed and what was verified
@@ -131,15 +131,15 @@ Verification:
 - verify layout and readability for Arabic where the changed UI is affected
 
 
-### Branch Rule
+### Mainline Rule
 
-Use `main` only when all of these are true:
-- the change is small
-- the change is low risk
-- the change is easy to undo
-- the change does not touch data, infra, billing, permissions, or test-harness behavior
+This repo ships directly on `main`.
 
-Use a task branch for everything else.
+Apply this rule:
+- keep changes reviewable, scoped, and easy to undo
+- keep one concern per commit whenever possible
+- verify risky work before reporting it complete
+- keep `main` stable at all times
 
 ### Test Integrity Rule
 
@@ -212,7 +212,7 @@ Report verification honestly.
 - Do not mix refactor, feature work, infra cleanup, and unrelated docs in one commit unless they are inseparable.
 - Keep commits reviewable and reversible.
 - Avoid `--no-verify` unless the hook is blocking an intentional, already-verified change; if used, document why.
-- Do not merge with a dirty worktree.
+- Do not commit or ship from a dirty worktree.
 
 ## Section 3: Reference Checklists
 
@@ -275,7 +275,7 @@ A task is done only when:
 - created data and temp artifacts were cleaned up
 - relevant docs were updated
 - the relevant docs were checked even if no update was needed
-- the branch or worktree is clean
+- the worktree is clean
 - the rollback path is understood
 - all new or changed user-facing text is available in English, Turkish, and Arabic
 

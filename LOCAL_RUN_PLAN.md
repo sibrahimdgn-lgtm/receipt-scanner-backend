@@ -1756,3 +1756,17 @@ Yeni oturumda once bu dosya okunacak, sonra bir sonraki `Durum: bekliyor` veya `
     - `FIREBASE_SERVICE_ACCOUNT` tek satir JSON olarak verildi
     - `getFirebaseAdminDiagnostics().credentialSource === 'env_firebase_service_account'`
     - `hasFirebaseAdminConfig() === true`
+
+## 2026-05-09 - Main-Only Git Workflow
+
+- Problem:
+  - Kullanici branch tabanli akisin kaldirilmasini ve tum branch'lerin `main` altinda toplanmis olmasini istedi.
+- Bulgular:
+  - `git fetch --all --prune`
+  - `git branch --all --verbose --no-abbrev`
+  - `git branch -r`
+  - Sonuc: repoda sadece `main` ve `origin/main` bulunuyor; merge bekleyen ek branch yok.
+- Duzeltme:
+  - `rules.md` icindeki branch secimi ve task-branch zorunlulugu kaldirildi.
+  - Workflow artik `main`-only olacak sekilde `Mainline Rule` ile guncellendi.
+  - `SHIP`, `Git And Commit Rule` ve `Done Gate` satirlari branch referansi icermeyecek sekilde sadeleştirildi.
