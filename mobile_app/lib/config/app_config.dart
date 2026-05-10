@@ -1,6 +1,3 @@
-import 'package:flutter/foundation.dart'
-    show kIsWeb, defaultTargetPlatform, TargetPlatform;
-
 /// Centralised app configuration for the receipt scanner.
 class AppConfig {
   AppConfig._();
@@ -9,17 +6,9 @@ class AppConfig {
   // shop_id is now taken from the JWT via AuthService, not hardcoded.
 
   // ── API ───────────────────────────────────────────────────
-  /// Web + iOS → localhost.  Android emulator → 10.0.2.2.
-  /// Uses kIsWeb + defaultTargetPlatform (no dart:io needed).
-  static String get baseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:3000';
-    }
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:3000';
-    }
-    return 'http://localhost:3000';
-  }
+  /// All client API traffic targets the live Render backend.
+  static const String baseUrl =
+      'https://receipt-scanner-backend-7hos.onrender.com';
 
   static String get scanEndpoint => '$baseUrl/api/receipts/scan';
 
