@@ -1,4 +1,4 @@
-const { getAuth, hasFirebaseAdminConfig } = require('../config/firebaseAdmin');
+const { hasFirebaseAdminConfig, admin } = require('../config/firebaseAdmin');
 
 function extractBearerToken(req) {
   const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -29,7 +29,7 @@ async function verifyFirebaseIdToken(idToken) {
   }
 
   try {
-    return await getAuth().verifyIdToken(idToken);
+    return await admin.auth().verifyIdToken(idToken);
   } catch (error) {
     console.error("GERCEK FIREBASE HATASI:", error);
     console.log("GELEN TOKEN:", idToken);
