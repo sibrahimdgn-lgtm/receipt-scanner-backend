@@ -31,6 +31,8 @@ async function verifyFirebaseIdToken(idToken) {
   try {
     return await getAuth().verifyIdToken(idToken);
   } catch (error) {
+    console.error("GERCEK FIREBASE HATASI:", error);
+    console.log("GELEN TOKEN:", idToken);
     throw buildAuthError('Invalid or expired Firebase token.', 401);
   }
 }

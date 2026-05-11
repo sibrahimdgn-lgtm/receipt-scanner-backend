@@ -11,8 +11,8 @@ require('dotenv').config();
 const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
-const receiptRoutes   = require('./src/routes/receipts');
-const authRoutes      = require('./src/routes/auth');
+const receiptRoutes = require('./src/routes/receipts');
+const authRoutes = require('./src/routes/auth');
 const dashboardRoutes = require('./src/routes/dashboard');
 const {
   ensureFirebaseAdmin,
@@ -49,8 +49,8 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ── Routes ────────────────────────────────────────────────────
-app.use('/api/auth',      authRoutes);
-app.use('/api/receipts',  receiptRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/receipts', receiptRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 // ── 404 handler ───────────────────────────────────────────────
@@ -79,14 +79,11 @@ app.use((err, req, res, _next) => {
 
 // ── Start server ──────────────────────────────────────────────
 app.listen(PORT, () => {
-  const firebaseDiagnostics = getFirebaseAdminDiagnostics();
-
   console.log(`\n🧾 Receipt Scanner API listening on http://localhost:${PORT}`);
   console.log(`   Firebase Admin configured: ${hasFirebaseAdminConfig() ? 'yes' : 'no'}`);
   console.log(`   Firebase credential source: ${firebaseDiagnostics.credentialSource}`);
   console.log(
-    `   Firebase service account path: ${
-      firebaseDiagnostics.credentialsPath || '(env/json)'
+    `   Firebase service account path: ${firebaseDiagnostics.credentialsPath || '(env/json)'
     }`
   );
   console.log(`   Firebase storage bucket: ${firebaseDiagnostics.storageBucket || '(not set)'}`);
