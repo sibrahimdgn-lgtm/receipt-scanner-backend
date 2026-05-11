@@ -9,7 +9,7 @@ const COLLECTIONS = {
 };
 
 function firestore() {
-  return getFirestore();
+  return admin.firestore();
 }
 
 function collection(name) {
