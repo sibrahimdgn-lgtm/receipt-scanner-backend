@@ -17,6 +17,7 @@ class DashboardService extends ChangeNotifier {
         'period': period,
         if (currencyCode != null && currencyCode.trim().isNotEmpty)
           'currency': currencyCode.trim().toUpperCase(),
+        'timezoneOffset': DateTime.now().timeZoneOffset.inMinutes.toString(),
       },
     );
     final res = await http.get(

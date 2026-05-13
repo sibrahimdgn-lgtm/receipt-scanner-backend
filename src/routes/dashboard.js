@@ -33,6 +33,11 @@ router.get('/summary', async (req, res, next) => {
     const requestContext = await getRequestContext(req);
     const receipts = await listReceiptsByShop(req.shopId);
 
+    const clientOffset = parseInt(req.query.timezoneOffset, 10);
+    const now = Number.isNaN(clientOffset)
+      ? new Date()
+      : new Date(Date.now() + clientOffset * 60000);
+
     return res.json(
       buildDashboardSummary({
         receipts,
@@ -40,6 +45,7 @@ router.get('/summary', async (req, res, next) => {
         requestedCurrency: req.query.currency,
         shopCurrencyCode: requestContext.shopCurrencyCode,
         language: requestContext.language,
+        now,
       })
     );
   } catch (err) {
