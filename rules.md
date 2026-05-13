@@ -131,15 +131,23 @@ Verification:
 - verify layout and readability for Arabic where the changed UI is affected
 
 
-### Mainline Rule
+### Branch Rule
 
-This repo ships directly on `main`.
+**All work happens on `main`. Do not create new branches or worktrees.**
 
-Apply this rule:
-- keep changes reviewable, scoped, and easy to undo
-- keep one concern per commit whenever possible
-- verify risky work before reporting it complete
-- keep `main` stable at all times
+- Never run `git checkout -b`, `git switch -c`, `git branch <new-name>`,
+  or `git worktree add`.
+- Never switch to a non-main branch via `git checkout <branch>` or
+  `git switch <branch>`.
+- Allowed: `git checkout main`, file restore (`git checkout -- <file>`,
+  `git checkout HEAD -- <file>`), branch deletion (`git branch -d` /
+  `-D`), read-only inspection (`git branch`, `git worktree list`).
+- Commit small, focused changes directly to `main`. If a change is too
+  risky, raise the concern in chat — do not branch unilaterally.
+- Enforced by `.githooks/` (git-side, all clients) and
+  `.claude/hooks/block-branch-mess.sh` wired via `.claude/settings.json`
+  (Claude Code model-side). Both ship dormant; see
+  `.githooks/README.md` for the activation command.
 
 ### Test Integrity Rule
 
