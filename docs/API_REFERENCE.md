@@ -59,6 +59,8 @@ Each line item can also include an optional `transaction_date` in `YYYY-MM-DD` f
   - auth required
   - query: `period=daily|weekly|monthly|yearly`
   - optional query: `currency=TRY`
+  - optional query: `timezoneOffset=<local-minus-UTC minutes>` to anchor
+    daily/weekly/monthly/yearly boundaries to the user's local calendar day
   - response is aggregated in memory from Firestore receipt documents
 - `GET /dashboard/history`
   - auth required

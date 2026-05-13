@@ -86,18 +86,54 @@ function shiftUtcDate(date, { days = 0, months = 0, years = 0 } = {}) {
   );
 }
 
-function getPeriodCutoff(period, now = new Date()) {
-  const today = startOfUtcDay(now);
+function resolveClientLocalNow(
+  now = new Date(),
+  timezoneOffsetMinutes = null
+) {
+  const base = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(base.getTime())) {
+    return new Date();
+  }
+
+  if (!Number.isFinite(timezoneOffsetMinutes)) {
+    return new Date(base.getTime());
+  }
+
+  // Flutter sends local-minus-UTC minutes; shifting the server clock by that
+  // delta lets us derive the client's current calendar day safely.
+  return new Date(base.getTime() + timezoneOffsetMinutes * 60000);
+}
+
+function getPeriodRange(
+  period,
+  now = new Date(),
+  timezoneOffsetMinutes = null
+) {
+  const localNow = resolveClientLocalNow(now, timezoneOffsetMinutes);
+  const today = startOfUtcDay(localNow);
+
   switch (period) {
     case 'weekly':
-      return shiftUtcDate(today, { months: -1 });
+      return {
+        start: shiftUtcDate(today, { months: -1 }),
+        end: today,
+      };
     case 'monthly':
-      return shiftUtcDate(today, { months: -6 });
+      return {
+        start: shiftUtcDate(today, { months: -6 }),
+        end: today,
+      };
     case 'yearly':
-      return shiftUtcDate(today, { years: -5 });
+      return {
+        start: shiftUtcDate(today, { years: -5 }),
+        end: today,
+      };
     case 'daily':
     default:
-      return shiftUtcDate(today, { days: -7 });
+      return {
+        start: shiftUtcDate(today, { days: -6 }),
+        end: today,
+      };
   }
 }
 
@@ -286,14 +322,19 @@ function buildDashboardSummary({
   shopCurrencyCode = DEFAULT_SHOP_CURRENCY,
   language = DEFAULT_LANGUAGE,
   now = new Date(),
+  timezoneOffsetMinutes = null,
 }) {
   const normalizedLanguage = normalizeLanguageCode(language);
   const periodConfig = getDashboardPeriodConfig(period);
-  const cutoff = getPeriodCutoff(period, now);
+  const periodRange = getPeriodRange(period, now, timezoneOffsetMinutes);
 
   const inPeriodReceipts = receipts.filter((receipt) => {
     const parsedDate = parseIsoDate(receipt.receipt_date);
-    return parsedDate && parsedDate >= cutoff;
+    return (
+      parsedDate
+      && parsedDate >= periodRange.start
+      && parsedDate <= periodRange.end
+    );
   });
 
   const availableCurrencies = buildAvailableCurrencies(
@@ -361,6 +402,8 @@ module.exports = {
   DASHBOARD_HISTORY_LIMIT,
   buildDashboardHistory,
   buildDashboardSummary,
+  getPeriodRange,
   localizeLineItems,
   normalizeReceiptForHistory,
+  resolveClientLocalNow,
 };

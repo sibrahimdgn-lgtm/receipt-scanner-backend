@@ -8,17 +8,30 @@ class DashboardService extends ChangeNotifier {
   static final DashboardService instance = DashboardService._();
   DashboardService._();
 
-  Future<Map<String, dynamic>> fetchSummary({
+  Uri buildSummaryUri({
     String period = 'daily',
     String? currencyCode,
-  }) async {
-    final uri = Uri.parse('${AppConfig.baseUrl}/api/dashboard/summary').replace(
+    Duration? timezoneOffsetOverride,
+  }) {
+    final offset = timezoneOffsetOverride ?? DateTime.now().timeZoneOffset;
+
+    return Uri.parse('${AppConfig.baseUrl}/api/dashboard/summary').replace(
       queryParameters: {
         'period': period,
         if (currencyCode != null && currencyCode.trim().isNotEmpty)
           'currency': currencyCode.trim().toUpperCase(),
-        'timezoneOffset': DateTime.now().timeZoneOffset.inMinutes.toString(),
+        'timezoneOffset': offset.inMinutes.toString(),
       },
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchSummary({
+    String period = 'daily',
+    String? currencyCode,
+  }) async {
+    final uri = buildSummaryUri(
+      period: period,
+      currencyCode: currencyCode,
     );
     final res = await http.get(
       uri,
