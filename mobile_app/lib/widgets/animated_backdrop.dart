@@ -6,10 +6,10 @@ class AnimatedBackdrop extends StatefulWidget {
   const AnimatedBackdrop({
     super.key,
     required this.child,
-    this.baseColor = const Color(0xFF13131D),
-    this.topColor = const Color(0xFF0D0D1A),
-    this.accentColor = const Color(0xFF00BFA6),
-    this.secondaryAccentColor = const Color(0xFF6C63FF),
+    this.baseColor = const Color(0xFFF4F7FB),
+    this.topColor = const Color(0xFF5D7A8B),
+    this.accentColor = const Color(0xFF13B5EA),
+    this.secondaryAccentColor = const Color(0xFF0F8FB5),
   });
 
   final Widget child;
@@ -58,8 +58,8 @@ class _AnimatedBackdropState extends State<AnimatedBackdrop>
                       end: Alignment.bottomRight,
                       colors: [
                         widget.topColor,
+                        Color.lerp(widget.topColor, widget.baseColor, 0.5)!,
                         widget.baseColor,
-                        widget.accentColor.withValues(alpha: 0.08),
                       ],
                     ),
                   ),
@@ -67,7 +67,7 @@ class _AnimatedBackdropState extends State<AnimatedBackdrop>
                 _orb(
                   size: shortestSide * 0.82,
                   alignment: Alignment(-1.05 + (t * 0.14), -1.0),
-                  color: widget.accentColor.withValues(alpha: 0.12),
+                  color: widget.accentColor.withValues(alpha: 0.16),
                   dx: 24,
                   dy: 14,
                   phase: 0,
@@ -75,7 +75,7 @@ class _AnimatedBackdropState extends State<AnimatedBackdrop>
                 _orb(
                   size: shortestSide * 0.72,
                   alignment: Alignment(1.05 - (t * 0.12), 0.9),
-                  color: widget.secondaryAccentColor.withValues(alpha: 0.1),
+                  color: widget.secondaryAccentColor.withValues(alpha: 0.12),
                   dx: 18,
                   dy: 22,
                   phase: math.pi / 2,
@@ -83,7 +83,7 @@ class _AnimatedBackdropState extends State<AnimatedBackdrop>
                 _orb(
                   size: shortestSide * 0.42,
                   alignment: Alignment(0.78, -0.28 + (t * 0.05)),
-                  color: widget.secondaryAccentColor.withValues(alpha: 0.08),
+                  color: widget.baseColor.withValues(alpha: 0.18),
                   dx: 10,
                   dy: 12,
                   phase: math.pi,

@@ -81,29 +81,52 @@ class ReceiptScannerApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme(Locale locale) {
-    const primaryColor = Color(0xFF00BFA6);
-    const secondaryColor = Color(0xFF6C63FF);
-    const surfaceColor = Color(0xFF1E1E2C);
-    const bgColor = Color(0xFF13131D);
+    const primaryColor = Color(0xFF13B5EA);
+    const secondaryColor = Color(0xFF0F8FB5);
+    const tertiaryColor = Color(0xFF74D6F6);
+    const surfaceColor = Color(0xFFFFFFFF);
+    const surfaceAltColor = Color(0xFFF1F6FA);
+    const bgColor = Color(0xFFF5F8FB);
+    const textColor = Color(0xFF102A43);
+    const mutedTextColor = Color(0xFF6B7C93);
+    const outlineColor = Color(0xFFD9E3EC);
+    const outlineVariantColor = Color(0xFFE7EEF4);
+    const errorColor = Color(0xFFD64545);
 
-    final colorScheme = ColorScheme.dark(
+    final colorScheme = ColorScheme.light(
       primary: primaryColor,
       secondary: secondaryColor,
+      tertiary: tertiaryColor,
       surface: surfaceColor,
-      onSurface: Colors.white,
-      error: const Color(0xFFFF5252),
+      onSurface: textColor,
+      onSurfaceVariant: mutedTextColor,
+      outline: outlineColor,
+      outlineVariant: outlineVariantColor,
+      error: errorColor,
+      onError: Colors.white,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      shadow: const Color(0x14102A43),
+      scrim: const Color(0x33102A43),
+      inverseSurface: const Color(0xFF17324D),
+      onInverseSurface: Colors.white,
     );
 
-    final baseTextTheme = ThemeData.dark().textTheme;
-    final textTheme = locale.languageCode == 'ar'
+    final baseTextTheme = ThemeData.light().textTheme;
+    final localizedTextTheme = locale.languageCode == 'ar'
         ? GoogleFonts.notoNaskhArabicTextTheme(baseTextTheme)
         : GoogleFonts.interTextTheme(baseTextTheme);
+    final textTheme = localizedTextTheme.apply(
+      bodyColor: textColor,
+      displayColor: textColor,
+      decorationColor: textColor,
+    );
 
     WidgetStateProperty<Color?> interactionOverlay(
       Color color, {
-      double hoverAlpha = 0.1,
-      double pressedAlpha = 0.14,
-      double focusedAlpha = 0.08,
+      double hoverAlpha = 0.08,
+      double pressedAlpha = 0.12,
+      double focusedAlpha = 0.06,
     }) {
       return WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.pressed)) {
@@ -119,10 +142,60 @@ class ReceiptScannerApp extends StatelessWidget {
       });
     }
 
-    return ThemeData.dark().copyWith(
+    return ThemeData.light().copyWith(
+      useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: bgColor,
+      canvasColor: surfaceAltColor,
+      cardColor: surfaceColor,
+      dividerColor: outlineVariantColor,
+      shadowColor: colorScheme.shadow,
+      splashFactory: InkSparkle.splashFactory,
       textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: textColor,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: textColor,
+        ),
+        iconTheme: const IconThemeData(color: mutedTextColor),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
+        labelStyle: const TextStyle(color: mutedTextColor),
+        hintStyle: const TextStyle(color: Color(0xFF8AA0B6)),
+        prefixIconColor: mutedTextColor,
+        suffixIconColor: mutedTextColor,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: outlineColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: outlineColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: primaryColor, width: 1.4),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: errorColor),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: errorColor, width: 1.4),
+        ),
+      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: primaryColor,
@@ -136,6 +209,11 @@ class ReceiptScannerApp extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ).copyWith(
           overlayColor: interactionOverlay(
             Colors.white,
@@ -146,34 +224,89 @@ class ReceiptScannerApp extends StatelessWidget {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ButtonStyle(
-          overlayColor: interactionOverlay(Colors.white),
+          foregroundColor: WidgetStateProperty.all(textColor),
+          backgroundColor: WidgetStateProperty.all(surfaceColor),
+          side: WidgetStateProperty.all(
+            const BorderSide(color: outlineColor),
+          ),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+          overlayColor: interactionOverlay(primaryColor),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.all(primaryColor),
           overlayColor: interactionOverlay(primaryColor),
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.all(mutedTextColor),
           overlayColor: interactionOverlay(primaryColor),
         ),
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.all(mutedTextColor),
+          side: WidgetStateProperty.all(
+            const BorderSide(color: outlineColor),
+          ),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return primaryColor.withValues(alpha: 0.12);
+            }
+            return surfaceColor.withValues(alpha: 0.72);
+          }),
           overlayColor: interactionOverlay(primaryColor),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final isSelected = states.contains(WidgetState.selected);
+          return textTheme.labelMedium?.copyWith(
+            color: isSelected ? textColor : mutedTextColor,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final isSelected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            color: isSelected ? primaryColor : mutedTextColor,
+          );
+        }),
         overlayColor: interactionOverlay(
           primaryColor,
-          hoverAlpha: 0.12,
-          pressedAlpha: 0.18,
-          focusedAlpha: 0.1,
+          hoverAlpha: 0.1,
+          pressedAlpha: 0.14,
+          focusedAlpha: 0.08,
         ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: surfaceColor,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: outlineVariantColor),
+        ),
+        textStyle: textTheme.bodyMedium?.copyWith(color: textColor),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: surfaceColor,
+        surfaceTintColor: Colors.transparent,
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+        backgroundColor: colorScheme.inverseSurface,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onInverseSurface,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -249,7 +382,7 @@ class _MainShellState extends State<MainShell>
     final l10n = context.l10n;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: theme.bottomSheetTheme.backgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -262,7 +395,7 @@ class _MainShellState extends State<MainShell>
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: theme.dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -289,7 +422,7 @@ class _MainShellState extends State<MainShell>
               l10n.trackYourSpending,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -297,7 +430,7 @@ class _MainShellState extends State<MainShell>
               l10n.trackYourSpendingBody,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white54,
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -323,7 +456,10 @@ class _MainShellState extends State<MainShell>
               onPressed: () => Navigator.pop(context),
               child: Text(
                 l10n.maybeLater,
-                style: const TextStyle(color: Colors.white38, fontSize: 14),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
@@ -354,16 +490,16 @@ class _MainShellState extends State<MainShell>
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
+            color: theme.colorScheme.surface,
             border: Border(
-              top: BorderSide(color: Colors.white.withValues(alpha: 0.07)),
+              top: BorderSide(color: theme.colorScheme.outlineVariant),
             ),
           ),
           child: NavigationBar(
             selectedIndex: _index,
             onDestinationSelected: _onTabTapped,
             backgroundColor: Colors.transparent,
-            indicatorColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+            indicatorColor: theme.colorScheme.primary.withValues(alpha: 0.14),
             labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
             destinations: [
               NavigationDestination(
@@ -376,11 +512,14 @@ class _MainShellState extends State<MainShell>
                   children: [
                     const Icon(Icons.bar_chart_outlined),
                     if (!AuthService.instance.isLoggedIn)
-                      const Positioned(
+                      Positioned(
                         right: 0,
                         top: 0,
-                        child:
-                            Icon(Icons.lock, size: 10, color: Colors.white38),
+                        child: Icon(
+                          Icons.lock,
+                          size: 10,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                   ],
                 ),
@@ -392,11 +531,14 @@ class _MainShellState extends State<MainShell>
                   children: [
                     const Icon(Icons.receipt_long_outlined),
                     if (!AuthService.instance.isLoggedIn)
-                      const Positioned(
+                      Positioned(
                         right: 0,
                         top: 0,
-                        child:
-                            Icon(Icons.lock, size: 10, color: Colors.white38),
+                        child: Icon(
+                          Icons.lock,
+                          size: 10,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                   ],
                 ),
