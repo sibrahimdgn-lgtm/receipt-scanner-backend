@@ -60,42 +60,26 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
         widget.initialEmail ?? AuthService.instance.currentFirebaseEmail;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF0D0D1A),
-                  Color(0xFF1A1A2E),
-                  Color(0xFF0D2137),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: -70,
-            left: -70,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.16),
-                    Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(28),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Container(
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(28),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -106,13 +90,8 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
                         height: 64,
                         margin: const EdgeInsets.only(bottom: 24),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          gradient: LinearGradient(
-                            colors: [
-                              theme.colorScheme.primary,
-                              theme.colorScheme.secondary,
-                            ],
-                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: theme.colorScheme.primary,
                         ),
                         child: const Icon(
                           Icons.storefront_rounded,
@@ -123,7 +102,7 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
                       Text(
                         l10n.completeShopSetupTitle,
                         style: theme.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -131,7 +110,7 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
                       Text(
                         l10n.completeShopSetupBody,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: Colors.white54,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                       if (email != null && email.isNotEmpty) ...[
@@ -139,14 +118,14 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
                         Text(
                           '${l10n.email}: $email',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white38,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                       const SizedBox(height: 32),
                       TextFormField(
                         controller: _shopNameCtrl,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: theme.colorScheme.onSurface),
                         decoration: _inputDecoration(
                           context,
                           label: l10n.shopName,
@@ -167,7 +146,7 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: _loading
@@ -193,7 +172,7 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -205,36 +184,38 @@ class _ShopSetupScreenState extends State<ShopSetupScreen> {
   }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white54),
-      prefixIcon: Icon(icon, color: Colors.white38),
+      prefixIcon: Icon(
+        icon,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
       filled: true,
-      fillColor: const Color(0x332C3046),
+      fillColor: Theme.of(context).colorScheme.surface,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: Theme.of(context).colorScheme.outlineVariant,
         ),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: Theme.of(context).colorScheme.outlineVariant,
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
           color: Theme.of(context).colorScheme.error,
         ),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
           color: Theme.of(context).colorScheme.error,
         ),

@@ -15,7 +15,7 @@ class ResultDialog extends StatelessWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (_) => ResultDialog(result: result),
     );
   }
@@ -33,12 +33,12 @@ class ResultDialog extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
             boxShadow: [
               BoxShadow(
-                color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                blurRadius: 30,
-                offset: const Offset(0, -8),
+                color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                blurRadius: 16,
+                offset: const Offset(0, -4),
               ),
             ],
           ),
@@ -50,7 +50,7 @@ class ResultDialog extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white24,
+                    color: theme.colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -66,12 +66,7 @@ class ResultDialog extends StatelessWidget {
                         height: 64,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              theme.colorScheme.primary,
-                              theme.colorScheme.secondary,
-                            ],
-                          ),
+                          color: theme.colorScheme.primary,
                         ),
                         child: const Icon(
                           Icons.check_rounded,
@@ -86,7 +81,7 @@ class ResultDialog extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -104,7 +99,7 @@ class ResultDialog extends StatelessWidget {
                           l10n.itemsSectionTitle(result.lineItems.length),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -162,18 +157,18 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            theme.colorScheme.primary.withValues(alpha: 0.15),
-            theme.colorScheme.secondary.withValues(alpha: 0.08),
-          ],
-        ),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.2),
+          color: theme.colorScheme.outlineVariant,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -182,14 +177,14 @@ class _SummaryCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             result.receiptDate,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white54,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 20),
@@ -206,7 +201,11 @@ class _SummaryCard extends StatelessWidget {
                 isPrimary: true,
                 theme: theme,
               ),
-              Container(width: 1, height: 40, color: Colors.white12),
+              Container(
+                width: 1,
+                height: 40,
+                color: theme.colorScheme.outlineVariant,
+              ),
               _MetricColumn(
                 label: l10n.tax,
                 value: CurrencyFormat.formatAmount(
@@ -217,7 +216,11 @@ class _SummaryCard extends StatelessWidget {
                 isPrimary: false,
                 theme: theme,
               ),
-              Container(width: 1, height: 40, color: Colors.white12),
+              Container(
+                width: 1,
+                height: 40,
+                color: theme.colorScheme.outlineVariant,
+              ),
               _MetricColumn(
                 label: l10n.items,
                 value: '${result.lineItems.length}',
@@ -254,15 +257,17 @@ class _MetricColumn extends StatelessWidget {
           style: TextStyle(
             fontSize: isPrimary ? 24 : 20,
             fontWeight: FontWeight.bold,
-            color: isPrimary ? theme.colorScheme.primary : Colors.white,
+            color: isPrimary
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.white54,
+            color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -294,9 +299,9 @@ class _LineItemTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -306,8 +311,8 @@ class _LineItemTile extends StatelessWidget {
               children: [
                 Text(
                   item.itemName,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                   ),
@@ -316,9 +321,9 @@ class _LineItemTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     formattedTransactionDate,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white38,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -348,9 +353,9 @@ class _LineItemTile extends StatelessWidget {
                     Text(
                       '${item.quantity.toStringAsFixed(item.quantity == item.quantity.roundToDouble() ? 0 : 1)} × '
                       '${CurrencyFormat.formatAmount(item.unitPrice, currencyCode: currencyCode, currencySymbol: currencySymbol)}',
-                      style: const TextStyle(
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 12,
-                        color: Colors.white38,
                       ),
                     ),
                   ],
@@ -364,8 +369,8 @@ class _LineItemTile extends StatelessWidget {
               currencyCode: currencyCode,
               currencySymbol: currencySymbol,
             ),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),

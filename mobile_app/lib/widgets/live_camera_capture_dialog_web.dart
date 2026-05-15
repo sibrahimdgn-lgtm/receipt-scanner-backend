@@ -269,8 +269,15 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
         child: Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+            boxShadow: [
+              BoxShadow(
+                color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -280,7 +287,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
                 width: 42,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: theme.colorScheme.outlineVariant,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -305,7 +312,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
             Text(
               l10n.cameraPreviewTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -313,7 +320,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
             Text(
               l10n.cameraPreviewBody,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white60,
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.45,
               ),
             ),
@@ -321,7 +328,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
             Container(
               height: 420,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: theme.colorScheme.primary.withValues(alpha: 0.28),
                 ),
@@ -343,9 +350,11 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
                       padding: const EdgeInsets.all(18),
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.4),
+                            color: theme.colorScheme.onPrimary.withValues(
+                              alpha: 0.8,
+                            ),
                             width: 1.6,
                           ),
                         ),
@@ -393,7 +402,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
               l10n.cameraStarting,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -410,16 +419,11 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
               height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.22),
-                    theme.colorScheme.secondary.withValues(alpha: 0.18),
-                  ],
-                ),
+                color: theme.colorScheme.primary.withValues(alpha: 0.14),
               ),
               child: Icon(
                 isError ? Icons.camera_alt_outlined : Icons.videocam_rounded,
-                color: Colors.white,
+                color: theme.colorScheme.primary,
                 size: 34,
               ),
             ),
@@ -428,7 +432,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
               l10n.cameraAccessTitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -437,7 +441,7 @@ class _LiveCameraCaptureSheetState extends State<_LiveCameraCaptureSheet> {
               isError ? _failureMessage(l10n) : l10n.cameraAccessBody,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white60,
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.45,
               ),
             ),

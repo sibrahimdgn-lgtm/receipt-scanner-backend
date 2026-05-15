@@ -65,42 +65,26 @@ class _LoginScreenState extends State<LoginScreen> {
     final l10n = context.l10n;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF0D0D1A),
-                  Color(0xFF1A1A2E),
-                  Color(0xFF0D2137)
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: -80,
-            right: -80,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.18),
-                    Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(28),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Container(
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(28),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -112,13 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 64,
                         margin: const EdgeInsets.only(bottom: 24),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          gradient: LinearGradient(
-                            colors: [
-                              theme.colorScheme.primary,
-                              theme.colorScheme.secondary,
-                            ],
-                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: theme.colorScheme.primary,
                         ),
                         child: const Icon(
                           Icons.receipt_long_rounded,
@@ -130,14 +109,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         l10n.welcomeBack,
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         l10n.signInToAccount,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: Colors.white38,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 36),
@@ -170,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _obscure
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: Colors.white38,
+                                  color: theme.colorScheme.onSurfaceVariant,
                                   size: 20,
                                 ),
                                 onPressed: () =>
@@ -190,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: _loading
@@ -217,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             '${l10n.dontHaveAccount} ',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white38,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           GestureDetector(
@@ -243,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -254,14 +233,16 @@ class _LoginScreenState extends State<LoginScreen> {
     return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2C),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           l10n.shopSetupMissingTitle,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         content: Text(
           l10n.shopSetupMissingBody,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(
@@ -306,25 +287,32 @@ class _LoginScreenState extends State<LoginScreen> {
       onFieldSubmitted: onSubmitted,
       autofillHints: autofillHints,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white38),
-        prefixIcon: Icon(icon, color: Colors.white38, size: 20),
+        prefixIcon: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
         suffixIcon: suffix,
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
             color: Theme.of(context).colorScheme.primary,
             width: 1.5,

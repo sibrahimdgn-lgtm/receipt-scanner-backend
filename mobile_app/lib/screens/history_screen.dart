@@ -257,7 +257,8 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                       height: 44,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.12),
                       ),
                       child: Icon(
                         Icons.receipt_rounded,

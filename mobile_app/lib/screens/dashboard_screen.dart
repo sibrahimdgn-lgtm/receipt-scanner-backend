@@ -149,7 +149,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ThemeData theme, {
     Color? color,
     Border? border,
-    double radius = 24,
+    double radius = 8,
   }) {
     return BoxDecoration(
       color: color ?? theme.colorScheme.surface,
@@ -165,7 +165,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final l10n = context.l10n;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: AnimatedBackdrop(
         child: RefreshIndicator(
           onRefresh: _load,
@@ -173,7 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor: Colors.transparent,
+                backgroundColor: theme.colorScheme.surface,
                 expandedHeight: 100,
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
@@ -412,9 +412,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }) {
     return InkWell(
       onTap: () => _changeCurrency(code),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(8),
       child: HoverLiftCard(
-        borderRadius: const BorderRadius.all(Radius.circular(14)),
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
         glowColor: isSelected
             ? theme.colorScheme.primary
             : theme.colorScheme.secondary,
@@ -427,7 +427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.all(16),
           decoration: _panelDecoration(
             theme,
-            radius: 18,
+            radius: 8,
             color: isSelected
                 ? theme.colorScheme.primary.withValues(alpha: 0.1)
                 : theme.colorScheme.surface,
@@ -500,7 +500,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color),
               ),
@@ -547,7 +547,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color),
               ),
@@ -579,7 +579,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: const [
             BoxShadow(
@@ -629,7 +629,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             side: WidgetStateProperty.all(BorderSide.none),
             shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
             overlayColor: WidgetStateProperty.resolveWith((states) {
@@ -675,7 +675,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: _cardShadow,
         ),
@@ -765,7 +765,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: _cardShadow,
         ),
