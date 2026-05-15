@@ -235,7 +235,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     final l10n = context.l10n;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: AnimatedBackdrop(
         child: SafeArea(
           child: Column(
@@ -249,13 +249,8 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          colors: [
-                            theme.colorScheme.primary,
-                            theme.colorScheme.secondary,
-                          ],
-                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        color: theme.colorScheme.primary,
                       ),
                       child: const Icon(
                         Icons.receipt_long_rounded,
@@ -477,7 +472,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(8),
                     color: theme.colorScheme.surface,
                     border: Border.all(color: theme.colorScheme.outlineVariant),
                     boxShadow: [
@@ -494,7 +489,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(8),
                           color:
                               theme.colorScheme.primary.withValues(alpha: 0.12),
                         ),
@@ -671,7 +666,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
           width: double.infinity,
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(8),
             color: theme.colorScheme.surface,
             border: Border.all(color: theme.colorScheme.outlineVariant),
             boxShadow: [
@@ -688,13 +683,8 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                 width: 68,
                 height: 68,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.secondary.withValues(alpha: 0.95),
-                      theme.colorScheme.primary.withValues(alpha: 0.9),
-                    ],
-                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  color: theme.colorScheme.primary,
                 ),
                 child: const Icon(
                   Icons.picture_as_pdf_rounded,
@@ -745,7 +735,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         width: double.infinity,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
           color: theme.colorScheme.surface,
           border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: [

@@ -52,7 +52,7 @@ class LanguageSwitcherButton extends StatelessWidget {
       builder: (_, __) => PopupMenuButton<String>(
         tooltip: context.l10n.language,
         padding: EdgeInsets.zero,
-        color: const Color(0xFF1A1A2E),
+        color: theme.colorScheme.surface,
         style: ButtonStyle(
           overlayColor: overlayColor,
           padding: const WidgetStatePropertyAll(EdgeInsets.zero),
@@ -61,9 +61,9 @@ class LanguageSwitcherButton extends StatelessWidget {
           ),
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: theme.colorScheme.outlineVariant,
           ),
         ),
         onSelected: (value) => _changeLanguage(context, value),
@@ -74,10 +74,10 @@ class LanguageSwitcherButton extends StatelessWidget {
             vertical: compact ? 8 : 8,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(14),
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: theme.colorScheme.outlineVariant,
             ),
           ),
           child: Row(
@@ -92,16 +92,16 @@ class LanguageSwitcherButton extends StatelessWidget {
                 Text(
                   code.toUpperCase(),
                   style: theme.textTheme.labelLarge?.copyWith(
-                    color: Colors.white70,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
                   ),
                 ),
               ],
               const SizedBox(width: 4),
-              const Icon(
+              Icon(
                 Icons.expand_more_rounded,
-                color: Colors.white54,
+                color: theme.colorScheme.onSurfaceVariant,
                 size: 18,
               ),
             ],
@@ -125,12 +125,12 @@ class LanguageSwitcherButton extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? theme.colorScheme.primary.withValues(alpha: 0.16)
-                            : Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(10),
+                            : theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isSelected
                               ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                              : Colors.white12,
+                              : theme.colorScheme.outlineVariant,
                         ),
                       ),
                       child: Text(
@@ -143,7 +143,7 @@ class LanguageSwitcherButton extends StatelessWidget {
                       child: Text(
                         _languageMenuLabel(context, menuCode),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontWeight:
                               isSelected ? FontWeight.w700 : FontWeight.w500,
                         ),

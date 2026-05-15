@@ -67,6 +67,7 @@ class ReceiptScannerApp extends StatelessWidget {
         title: 'Receipt Scanner',
         debugShowCheckedModeBanner: false,
         theme: _buildTheme(AuthService.instance.locale),
+        themeMode: ThemeMode.light,
         locale: AuthService.instance.locale,
         supportedLocales: AppLanguages.supportedLocales,
         localizationsDelegates: const [
@@ -81,12 +82,12 @@ class ReceiptScannerApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme(Locale locale) {
-    const primaryColor = Color(0xFF13B5EA);
-    const secondaryColor = Color(0xFF1678C2);
+    const primaryColor = Color(0xFF00B4CE);
+    const secondaryColor = Color(0xFF1487B8);
     const tertiaryColor = Color(0xFF86DDF8);
     const surfaceColor = Color(0xFFFFFFFF);
-    const surfaceAltColor = Color(0xFFF2F7FB);
-    const bgColor = Color(0xFFF8FBFD);
+    const surfaceAltColor = Color(0xFFF7F9FC);
+    const bgColor = Color(0xFFF4F5F8);
     const textColor = Color(0xFF163247);
     const mutedTextColor = Color(0xFF5E7386);
     const outlineColor = Color(0xFFD7E3EC);
@@ -153,7 +154,7 @@ class ReceiptScannerApp extends StatelessWidget {
       splashFactory: InkSparkle.splashFactory,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -176,23 +177,23 @@ class ReceiptScannerApp extends StatelessWidget {
         prefixIconColor: mutedTextColor,
         suffixIconColor: mutedTextColor,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: outlineColor),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: outlineColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: primaryColor, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: errorColor),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: errorColor, width: 1.4),
         ),
       ),
@@ -212,7 +213,7 @@ class ReceiptScannerApp extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
           ),
         ).copyWith(
           overlayColor: interactionOverlay(
@@ -231,7 +232,7 @@ class ReceiptScannerApp extends StatelessWidget {
           ),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
           overlayColor: interactionOverlay(primaryColor),
@@ -298,7 +299,7 @@ class ReceiptScannerApp extends StatelessWidget {
         color: surfaceColor,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
           side: const BorderSide(color: outlineVariantColor),
         ),
         textStyle: textTheme.bodyMedium?.copyWith(color: textColor),
@@ -410,12 +411,7 @@ class _MainShellState extends State<MainShell>
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.2),
-                    theme.colorScheme.secondary.withValues(alpha: 0.2),
-                  ],
-                ),
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
               ),
               child: Icon(
                 Icons.bar_chart_rounded,

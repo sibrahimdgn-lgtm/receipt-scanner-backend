@@ -145,9 +145,9 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
     final l10n = context.l10n;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF13131D),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A2E),
+        backgroundColor: theme.colorScheme.surface,
         title: Text(l10n.editReceiptDetails),
         actions: [
           if (_saving)
@@ -184,7 +184,7 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
               Text(
                 l10n.generalInfo,
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.white38,
+                  color: theme.colorScheme.onSurfaceVariant,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -234,7 +234,10 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
               const SizedBox(height: 8),
               Text(
                 l10n.currencyCodeHint,
-                style: const TextStyle(color: Colors.white38, fontSize: 12),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                ),
               ),
               const SizedBox(height: 32),
               Row(
@@ -243,7 +246,7 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                   Text(
                     l10n.extractedItems,
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: Colors.white38,
+                      color: theme.colorScheme.onSurfaceVariant,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -274,11 +277,18 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.03),
-                    borderRadius: BorderRadius.circular(16),
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: theme.colorScheme.outlineVariant,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
@@ -287,19 +297,19 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                           Expanded(
                             child: TextFormField(
                               initialValue: item['item_name']?.toString() ?? '',
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
                               decoration: InputDecoration(
                                 labelText: l10n.itemName,
-                                labelStyle:
-                                    const TextStyle(color: Colors.white38),
                               ),
                               onChanged: (value) => item['item_name'] = value,
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.delete_outline,
-                              color: Colors.white38,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                             onPressed: () => setState(() {
                               _items.removeAt(index);
@@ -316,11 +326,11 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                             child: TextFormField(
                               initialValue: item['quantity']?.toString() ?? '1',
                               keyboardType: TextInputType.number,
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
                               decoration: InputDecoration(
                                 labelText: l10n.quantityShort,
-                                labelStyle:
-                                    const TextStyle(color: Colors.white38),
                               ),
                               onChanged: (value) {
                                 item['quantity'] = double.tryParse(value) ?? 1;
@@ -337,15 +347,15 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                              ),
                               decoration: InputDecoration(
                                 labelText: CurrencyFormat.labelWithSymbol(
                                   l10n.price,
                                   currencyCode: _currencyCode,
                                   currencySymbol: _currencySymbol,
                                 ),
-                                labelStyle:
-                                    const TextStyle(color: Colors.white38),
                               ),
                               onChanged: (value) {
                                 item['total_price'] =
@@ -362,10 +372,9 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                         value: ReceiptCategories.normalize(
                           item['category']?.toString(),
                         ),
-                        dropdownColor: const Color(0xFF1A1A2E),
+                        dropdownColor: theme.colorScheme.surface,
                         decoration: InputDecoration(
                           labelText: l10n.category,
-                          labelStyle: const TextStyle(color: Colors.white38),
                         ),
                         items: ReceiptCategories.values
                             .map(
@@ -376,7 +385,9 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                                     context,
                                     categoryKey,
                                   ),
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                             )
@@ -395,7 +406,9 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                   child: Center(
                     child: Text(
                       l10n.noLineItems,
-                      style: const TextStyle(color: Colors.white38),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -422,15 +435,20 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
       textCapitalization:
           uppercase ? TextCapitalization.characters : TextCapitalization.none,
       onChanged: onChanged,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white38),
-        prefixIcon: Icon(icon, color: Colors.white38),
+        prefixIcon: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
         ),
       ),
     );
