@@ -100,7 +100,7 @@ void main() {
     await tester.pumpWidget(const ReceiptScannerApp());
     await tester.pump(const Duration(milliseconds: 100));
 
-    final context = tester.element(find.byType(NavigationBar));
+    final context = tester.element(find.byType(Scaffold).first);
     final theme = Theme.of(context);
 
     final filledHover = theme.filledButtonTheme.style?.overlayColor?.resolve({

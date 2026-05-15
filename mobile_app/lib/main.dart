@@ -497,55 +497,135 @@ class _MainShellState extends State<MainShell>
               top: BorderSide(color: theme.colorScheme.outlineVariant),
             ),
           ),
-          child: NavigationBar(
-            selectedIndex: _index,
-            onDestinationSelected: _onTabTapped,
-            backgroundColor: Colors.transparent,
-            indicatorColor: theme.colorScheme.primary.withValues(alpha: 0.14),
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.camera_alt_outlined),
-                selectedIcon: const Icon(Icons.camera_alt_rounded),
-                label: l10n.navScan,
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _BottomNavButton(
+                    label: l10n.navScan,
+                    selected: _index == 0,
+                    onTap: () => _onTabTapped(0),
+                    icon: const Icon(Icons.camera_alt_outlined),
+                    selectedIcon: const Icon(Icons.camera_alt_rounded),
+                  ),
+                  _BottomNavButton(
+                    label: l10n.navDashboard,
+                    selected: _index == 1,
+                    onTap: () => _onTabTapped(1),
+                    icon: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(Icons.bar_chart_outlined),
+                        if (!AuthService.instance.isLoggedIn)
+                          Positioned(
+                            right: -2,
+                            top: -2,
+                            child: Icon(
+                              Icons.lock,
+                              size: 10,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                    selectedIcon: const Icon(Icons.bar_chart_rounded),
+                  ),
+                  _BottomNavButton(
+                    label: l10n.navHistory,
+                    selected: _index == 2,
+                    onTap: () => _onTabTapped(2),
+                    icon: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(Icons.receipt_long_outlined),
+                        if (!AuthService.instance.isLoggedIn)
+                          Positioned(
+                            right: -2,
+                            top: -2,
+                            child: Icon(
+                              Icons.lock,
+                              size: 10,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                    selectedIcon: const Icon(Icons.receipt_long_rounded),
+                  ),
+                ],
               ),
-              NavigationDestination(
-                icon: Stack(
-                  children: [
-                    const Icon(Icons.bar_chart_outlined),
-                    if (!AuthService.instance.isLoggedIn)
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Icon(
-                          Icons.lock,
-                          size: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                  ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomNavButton extends StatelessWidget {
+  const _BottomNavButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.icon,
+    required this.selectedIcon,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget icon;
+  final Widget selectedIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
                 ),
-                selectedIcon: const Icon(Icons.bar_chart_rounded),
-                label: l10n.navDashboard,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? theme.colorScheme.primary.withValues(alpha: 0.14)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: IconTheme(
+                  data: IconThemeData(
+                    color: selected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
+                    size: 24,
+                  ),
+                  child: selected ? selectedIcon : icon,
+                ),
               ),
-              NavigationDestination(
-                icon: Stack(
-                  children: [
-                    const Icon(Icons.receipt_long_outlined),
-                    if (!AuthService.instance.isLoggedIn)
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Icon(
-                          Icons.lock,
-                          size: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                  ],
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: selected
+                      ? theme.colorScheme.onSurface
+                      : theme.colorScheme.onSurfaceVariant,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
-                selectedIcon: const Icon(Icons.receipt_long_rounded),
-                label: l10n.navHistory,
               ),
             ],
           ),
