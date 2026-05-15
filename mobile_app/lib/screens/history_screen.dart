@@ -76,7 +76,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final l10n = context.l10n;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: AnimatedBackdrop(
         child: RefreshIndicator(
           onRefresh: _load,
@@ -84,7 +84,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor: Colors.transparent,
+                backgroundColor: theme.colorScheme.surface,
                 pinned: true,
                 expandedHeight: 80,
                 flexibleSpace: FlexibleSpaceBar(
@@ -232,7 +232,7 @@ class _ReceiptCardState extends State<_ReceiptCard> {
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: _expanded
                   ? theme.colorScheme.primary.withValues(alpha: 0.2)
@@ -257,12 +257,7 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                       height: 44,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            theme.colorScheme.primary.withValues(alpha: 0.2),
-                            theme.colorScheme.secondary.withValues(alpha: 0.2),
-                          ],
-                        ),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
                       ),
                       child: Icon(
                         Icons.receipt_rounded,
@@ -333,7 +328,7 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surfaceContainerHighest
                                   .withValues(alpha: 0.35),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: theme.colorScheme.outlineVariant,
                               ),
