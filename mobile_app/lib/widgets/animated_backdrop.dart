@@ -81,14 +81,6 @@ class _AnimatedBackdropState extends State<AnimatedBackdrop>
                   dy: 16,
                   phase: math.pi / 2,
                 ),
-                _orb(
-                  size: shortestSide * 0.36,
-                  alignment: Alignment(1.02, 0.84 + (t * 0.03)),
-                  color: Colors.white.withValues(alpha: 0.72),
-                  dx: 8,
-                  dy: 10,
-                  phase: math.pi,
-                ),
                 child!,
               ],
             );
