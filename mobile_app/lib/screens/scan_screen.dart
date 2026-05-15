@@ -146,7 +146,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     final l10n = context.l10n;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -159,7 +159,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: theme.colorScheme.outlineVariant,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -174,7 +174,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               l10n.saveAndTrackSpending,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -182,7 +182,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               l10n.saveAndTrackSpendingBody,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white54,
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -208,7 +208,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 l10n.notNow,
-                style: const TextStyle(color: Colors.white38),
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
               ),
             ),
           ],
@@ -272,14 +272,14 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                             l10n.appTitle,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: theme.colorScheme.onSurface,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             l10n.poweredByGemini,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white38,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -350,22 +350,27 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(20),
-                                          color: Colors.white
-                                              .withValues(alpha: 0.07),
+                                          color: theme.colorScheme.surface,
+                                          border: Border.all(
+                                            color: theme
+                                                .colorScheme.outlineVariant,
+                                          ),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Icon(
+                                            Icon(
                                               Icons.logout_rounded,
-                                              color: Colors.white70,
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
                                               size: 16,
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
                                               l10n.signOut,
-                                              style: const TextStyle(
-                                                color: Colors.white70,
+                                              style: TextStyle(
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -447,7 +452,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -457,8 +462,9 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               Text(
                 l10n.scanReceiptSubtitle,
                 textAlign: TextAlign.center,
-                style:
-                    theme.textTheme.bodyLarge?.copyWith(color: Colors.white60),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -472,10 +478,15 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
-                    color: Colors.white.withValues(alpha: 0.04),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.08),
-                    ),
+                    color: theme.colorScheme.surface,
+                    border: Border.all(color: theme.colorScheme.outlineVariant),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
@@ -500,7 +511,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                             Text(
                               l10n.scanUploadOptions,
                               style: theme.textTheme.titleSmall?.copyWith(
-                                color: Colors.white,
+                                color: theme.colorScheme.onSurface,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -508,7 +519,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                             Text(
                               l10n.supportedScanFormats,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.white54,
+                                color: theme.colorScheme.onSurfaceVariant,
                                 height: 1.4,
                               ),
                             ),
@@ -531,10 +542,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                   OutlinedButton.icon(
                     onPressed: _pickCameraReceipt,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.18),
-                      ),
+                      foregroundColor: theme.colorScheme.onSurface,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,
                         vertical: 16,
@@ -576,7 +584,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                   child: Text(
                     l10n.tapToScan,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white30,
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -595,10 +603,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                     OutlinedButton.icon(
                       onPressed: _pickCameraReceipt,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white70,
-                        side: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.18),
-                        ),
+                        foregroundColor: theme.colorScheme.onSurface,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 18,
                           vertical: 16,
@@ -617,10 +622,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                     OutlinedButton.icon(
                       onPressed: _pickUploadReceipt,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white70,
-                        side: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.18),
-                        ),
+                        foregroundColor: theme.colorScheme.onSurface,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 18,
                           vertical: 16,
@@ -670,13 +672,13 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            color: const Color(0xFF171A28),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            color: theme.colorScheme.surface,
+            border: Border.all(color: theme.colorScheme.outlineVariant),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.16),
-                blurRadius: 28,
-                offset: const Offset(0, 14),
+                color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
               ),
             ],
           ),
@@ -708,7 +710,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                     Text(
                       l10n.pdfDocument,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -716,14 +718,14 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                     Text(
                       file.filename,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       l10n.pdfReadyForAnalysis,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white54,
+                        color: theme.colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),
                     ),
@@ -744,13 +746,13 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: const Color(0xFF171A28),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          color: theme.colorScheme.surface,
+          border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.16),
-              blurRadius: 28,
-              offset: const Offset(0, 14),
+              color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
@@ -768,7 +770,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                   child: Text(
                     l10n.selectedReceiptFile,
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -794,7 +796,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
             Text(
               file.filename,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white70,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -835,21 +837,21 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               l10n.analyzingReceipt,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               l10n.analyzingReceiptBody,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white38,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 32),
             SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                backgroundColor: Colors.white10,
+                backgroundColor: theme.colorScheme.outlineVariant,
                 borderRadius: BorderRadius.circular(4),
                 color: theme.colorScheme.primary,
               ),

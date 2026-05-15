@@ -82,15 +82,15 @@ class ReceiptScannerApp extends StatelessWidget {
 
   ThemeData _buildTheme(Locale locale) {
     const primaryColor = Color(0xFF13B5EA);
-    const secondaryColor = Color(0xFF0F8FB5);
-    const tertiaryColor = Color(0xFF74D6F6);
+    const secondaryColor = Color(0xFF1678C2);
+    const tertiaryColor = Color(0xFF86DDF8);
     const surfaceColor = Color(0xFFFFFFFF);
-    const surfaceAltColor = Color(0xFFF1F6FA);
-    const bgColor = Color(0xFFF5F8FB);
-    const textColor = Color(0xFF102A43);
-    const mutedTextColor = Color(0xFF6B7C93);
-    const outlineColor = Color(0xFFD9E3EC);
-    const outlineVariantColor = Color(0xFFE7EEF4);
+    const surfaceAltColor = Color(0xFFF2F7FB);
+    const bgColor = Color(0xFFF8FBFD);
+    const textColor = Color(0xFF163247);
+    const mutedTextColor = Color(0xFF5E7386);
+    const outlineColor = Color(0xFFD7E3EC);
+    const outlineVariantColor = Color(0xFFE6EEF5);
     const errorColor = Color(0xFFD64545);
 
     final colorScheme = ColorScheme.light(
@@ -106,9 +106,9 @@ class ReceiptScannerApp extends StatelessWidget {
       onError: Colors.white,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      shadow: const Color(0x14102A43),
-      scrim: const Color(0x33102A43),
-      inverseSurface: const Color(0xFF17324D),
+      shadow: const Color(0x12163247),
+      scrim: const Color(0x26163247),
+      inverseSurface: const Color(0xFF163247),
       onInverseSurface: Colors.white,
     );
 
@@ -251,23 +251,28 @@ class ReceiptScannerApp extends StatelessWidget {
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.all(mutedTextColor),
           side: WidgetStateProperty.all(
             const BorderSide(color: outlineColor),
           ),
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return primaryColor.withValues(alpha: 0.12);
+              return primaryColor;
             }
-            return surfaceColor.withValues(alpha: 0.72);
+            return surfaceColor;
+          }),
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            return mutedTextColor;
           }),
           overlayColor: interactionOverlay(primaryColor),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.transparent,
+        backgroundColor: surfaceColor,
         surfaceTintColor: Colors.transparent,
-        elevation: 0,
+        elevation: 1,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final isSelected = states.contains(WidgetState.selected);
           return textTheme.labelMedium?.copyWith(
@@ -281,6 +286,7 @@ class ReceiptScannerApp extends StatelessWidget {
             color: isSelected ? primaryColor : mutedTextColor,
           );
         }),
+        indicatorColor: primaryColor.withValues(alpha: 0.14),
         overlayColor: interactionOverlay(
           primaryColor,
           hoverAlpha: 0.1,

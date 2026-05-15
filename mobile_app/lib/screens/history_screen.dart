@@ -93,7 +93,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     l10n.receiptsTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -112,7 +112,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Center(
                     child: Text(
                       l10n.historySignInPrompt,
-                      style: const TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
@@ -121,7 +123,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Center(
                     child: Text(
                       _error!,
-                      style: const TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
@@ -142,17 +146,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           const SizedBox(height: 16),
                           Text(
                             l10n.noReceiptsYet,
-                            style: const TextStyle(
-                              color: Colors.white38,
-                              fontSize: 16,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             l10n.scanFirstReceipt,
-                            style: const TextStyle(
-                              color: Colors.white24,
-                              fontSize: 13,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -229,11 +231,20 @@ class _ReceiptCardState extends State<_ReceiptCard> {
           duration: const Duration(milliseconds: 240),
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: _expanded ? 0.12 : 0.06),
+              color: _expanded
+                  ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                  : theme.colorScheme.outlineVariant,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -266,10 +277,9 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                         children: [
                           Text(
                             vendor,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w700,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -277,9 +287,8 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                           const SizedBox(height: 3),
                           Text(
                             '$date  ·  ${l10n.itemCountLabel(itemCount)}  ·  ${CurrencyFormat.codeWithSymbol(currencyCode: currencyCode, currencySymbol: currencySymbol)}',
-                            style: const TextStyle(
-                              color: Colors.white38,
-                              fontSize: 12,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -303,7 +312,7 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                         const SizedBox(height: 4),
                         Icon(
                           _expanded ? Icons.expand_less : Icons.expand_more,
-                          color: Colors.white24,
+                          color: theme.colorScheme.onSurfaceVariant,
                           size: 18,
                         ),
                       ],
@@ -322,8 +331,12 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                           child: Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.03),
+                              color: theme.colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.35),
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: theme.colorScheme.outlineVariant,
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -354,7 +367,10 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-                                Container(height: 1, color: Colors.white12),
+                                Container(
+                                  height: 1,
+                                  color: theme.colorScheme.outlineVariant,
+                                ),
                                 const SizedBox(height: 12),
                                 if (receipt['line_items'] != null &&
                                     (receipt['line_items'] as List).isNotEmpty)
@@ -382,10 +398,11 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                         children: [
                                           Text(
                                             '${quantity.toInt()}x',
-                                            style: const TextStyle(
-                                              color: Colors.white38,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
+                                              fontWeight: FontWeight.w700,
                                             ),
                                           ),
                                           const SizedBox(width: 8),
@@ -398,9 +415,11 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                                   lineItem['item_name']
                                                           ?.toString() ??
                                                       l10n.unknownItem,
-                                                  style: const TextStyle(
-                                                    color: Colors.white70,
-                                                    fontSize: 13,
+                                                  style: theme
+                                                      .textTheme.bodySmall
+                                                      ?.copyWith(
+                                                    color: theme
+                                                        .colorScheme.onSurface,
                                                   ),
                                                 ),
                                                 if (formattedTransactionDate !=
@@ -412,9 +431,11 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                                     ),
                                                     child: Text(
                                                       formattedTransactionDate,
-                                                      style: const TextStyle(
-                                                        color: Colors.white38,
-                                                        fontSize: 12,
+                                                      style: theme
+                                                          .textTheme.bodySmall
+                                                          ?.copyWith(
+                                                        color: theme.colorScheme
+                                                            .onSurfaceVariant,
                                                       ),
                                                     ),
                                                   ),
@@ -428,10 +449,11 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                               currencyCode: currencyCode,
                                               currencySymbol: currencySymbol,
                                             ),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color:
+                                                  theme.colorScheme.onSurface,
+                                              fontWeight: FontWeight.w700,
                                             ),
                                           ),
                                         ],
@@ -444,9 +466,10 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                         const EdgeInsets.symmetric(vertical: 8),
                                     child: Text(
                                       l10n.noExtractedItems,
-                                      style: const TextStyle(
-                                        color: Colors.white38,
-                                        fontSize: 13,
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -509,16 +532,20 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                           context: context,
                                           builder: (ctx) => AlertDialog(
                                             backgroundColor:
-                                                const Color(0xFF1A1A2E),
+                                                theme.colorScheme.surface,
                                             title: Text(
                                               l10n.deleteReceiptTitle,
-                                              style: const TextStyle(
-                                                  color: Colors.white),
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.onSurface,
+                                              ),
                                             ),
                                             content: Text(
                                               l10n.deleteReceiptBody,
-                                              style: const TextStyle(
-                                                  color: Colors.white70),
+                                              style: TextStyle(
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
                                             ),
                                             actions: [
                                               TextButton(
@@ -526,8 +553,9 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                                     Navigator.pop(ctx, false),
                                                 child: Text(
                                                   l10n.cancel,
-                                                  style: const TextStyle(
-                                                    color: Colors.white70,
+                                                  style: TextStyle(
+                                                    color: theme.colorScheme
+                                                        .onSurfaceVariant,
                                                   ),
                                                 ),
                                               ),
@@ -587,7 +615,10 @@ class _ReceiptCardState extends State<_ReceiptCard> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white38, fontSize: 11),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontSize: 11,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
@@ -602,5 +633,9 @@ class _ReceiptCardState extends State<_ReceiptCard> {
     );
   }
 
-  Widget _divider() => Container(width: 1, height: 30, color: Colors.white12);
+  Widget _divider() => Container(
+        width: 1,
+        height: 30,
+        color: Theme.of(context).colorScheme.outlineVariant,
+      );
 }
