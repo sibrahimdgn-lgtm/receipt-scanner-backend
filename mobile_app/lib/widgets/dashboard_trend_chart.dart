@@ -154,22 +154,31 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (widget.trend.isEmpty) {
       return Container(
         height: 150,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(16),
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F102A43),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
         ),
         child: Text(
           widget.noDataText,
-          style: const TextStyle(color: Colors.white30),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
         ),
       );
     }
 
-    final theme = Theme.of(context);
     final locale = Localizations.localeOf(context);
     final visibleGroups = <List<DashboardTrendBucket>>[];
     final bars = widget.trend.asMap().entries.map((entry) {
@@ -195,7 +204,7 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
                 ? BackgroundBarChartRodData(
                     show: true,
                     toY: bucket.total,
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: theme.colorScheme.outlineVariant,
                   )
                 : BackgroundBarChartRodData(),
           );
@@ -210,12 +219,19 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
     return HoverLiftCard(
       glowColor: theme.colorScheme.secondary,
       child: Container(
-        height: 190,
-        padding: const EdgeInsets.fromLTRB(8, 16, 16, 8),
+        height: 220,
+        padding: const EdgeInsets.fromLTRB(14, 20, 18, 10),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F102A43),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
         ),
         child: BarChart(
           BarChartData(
@@ -225,8 +241,10 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
             barGroups: bars,
             gridData: FlGridData(
               drawVerticalLine: false,
-              getDrawingHorizontalLine: (_) =>
-                  FlLine(color: Colors.white12, strokeWidth: 1),
+              getDrawingHorizontalLine: (_) => FlLine(
+                color: theme.colorScheme.outlineVariant,
+                strokeWidth: 1,
+              ),
             ),
             borderData: FlBorderData(show: false),
             titlesData: FlTitlesData(
@@ -248,8 +266,8 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
                         index < dates.length ? dates[index] : '',
-                        style: const TextStyle(
-                          color: Colors.white38,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 10,
                         ),
                       ),
@@ -285,7 +303,7 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
               touchTooltipData: BarTouchTooltipData(
                 fitInsideHorizontally: true,
                 fitInsideVertically: true,
-                getTooltipColor: (_) => const Color(0xFF1E1E2C),
+                getTooltipColor: (_) => theme.colorScheme.inverseSurface,
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   if (groupIndex < 0 || groupIndex >= visibleGroups.length) {
                     return null;
@@ -306,8 +324,8 @@ class _DashboardTrendChartState extends State<DashboardTrendChart> {
                       currencyCode: widget.activeCurrencyCode,
                       currencySymbol: widget.activeCurrencySymbol,
                     )}',
-                    const TextStyle(
-                      color: Colors.white,
+                    TextStyle(
+                      color: theme.colorScheme.onInverseSurface,
                       fontWeight: FontWeight.w600,
                       height: 1.35,
                     ),

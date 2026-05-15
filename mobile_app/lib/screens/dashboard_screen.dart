@@ -20,6 +20,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  static const _cardShadow = [
+    BoxShadow(
+      color: Color(0x0F102A43),
+      blurRadius: 24,
+      offset: Offset(0, 12),
+    ),
+  ];
+
   Map<String, dynamic>? _data;
   bool _loading = true;
   String? _error;
@@ -137,6 +145,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  BoxDecoration _panelDecoration(
+    ThemeData theme, {
+    Color? color,
+    Border? border,
+    double radius = 24,
+  }) {
+    return BoxDecoration(
+      color: color ?? theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(radius),
+      border: border ?? Border.all(color: theme.colorScheme.outlineVariant),
+      boxShadow: _cardShadow,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -164,13 +186,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         l10n.navDashboard,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         AuthService.instance.shopName ?? '',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white38,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -181,7 +203,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     margin: EdgeInsets.only(right: 4),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.white54),
+                    icon: Icon(
+                      Icons.refresh,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     onPressed: _load,
                   ),
                 ],
@@ -195,7 +220,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Center(
                     child: Text(
                       l10n.dashboardSignInPrompt,
-                      style: const TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
@@ -204,13 +231,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Center(
                     child: Text(
                       _error!,
-                      style: const TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
               else ...[
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 36),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       _reveal(0, _buildSpendingCards(theme, l10n)),
@@ -265,13 +294,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           summary['total_spend'],
           theme,
           theme.colorScheme.primary,
+          icon: Icons.account_balance_wallet_rounded,
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 16),
         _summaryCountCard(
           l10n.totalReceipts,
           summary['receipt_count'],
           theme,
-          const Color(0xFF6C63FF),
+          theme.colorScheme.secondary,
+          icon: Icons.receipt_long_rounded,
         ),
       ],
     );
@@ -287,12 +318,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return HoverLiftCard(
       glowColor: theme.colorScheme.secondary,
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-        ),
+        padding: const EdgeInsets.all(22),
+        decoration: _panelDecoration(theme),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -309,7 +336,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ? l10n.dashboardCurrencyFilter
                       : l10n.receiptCurrency,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -321,14 +348,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ? l10n.dashboardCurrencyFilterBody
                   : l10n.dashboardCurrencySingleBody(activeLabel),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.white54,
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.45,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 18),
             Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: 12,
+              runSpacing: 12,
               children: currencies.isEmpty
                   ? [
                       _currencyChip(
@@ -397,26 +424,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           width: 152,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isSelected
-                  ? [
-                      theme.colorScheme.primary.withValues(alpha: 0.22),
-                      theme.colorScheme.secondary.withValues(alpha: 0.12),
-                    ]
-                  : [
-                      Colors.white.withValues(alpha: 0.03),
-                      Colors.white.withValues(alpha: 0.02),
-                    ],
-            ),
+          padding: const EdgeInsets.all(16),
+          decoration: _panelDecoration(
+            theme,
+            radius: 18,
+            color: isSelected
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                : theme.colorScheme.surface,
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary.withValues(alpha: 0.35)
-                  : Colors.white.withValues(alpha: 0.08),
+                  : theme.colorScheme.outlineVariant,
             ),
           ),
           child: Column(
@@ -427,30 +445,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   currencyCode: code,
                   currencySymbol: symbol,
                 ),
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.white70,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
-                  fontSize: 13,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 CurrencyFormat.formatAmount(
                   totalSpend,
                   currencyCode: code,
                   currencySymbol: symbol,
                 ),
-                style: TextStyle(
-                  color:
-                      isSelected ? theme.colorScheme.primary : Colors.white70,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 l10n.receiptCountLabel(receiptCount),
-                style: const TextStyle(color: Colors.white38, fontSize: 11),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -463,41 +482,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String label,
     dynamic count,
     ThemeData theme,
-    Color color,
-  ) {
+    Color color, {
+    required IconData icon,
+  }) {
     final value = int.tryParse(count?.toString() ?? '0') ?? 0;
     return Expanded(
       child: HoverLiftCard(
         glowColor: color,
         child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withValues(alpha: 0.18),
-                color.withValues(alpha: 0.06),
-              ],
-            ),
-            border: Border.all(color: color.withValues(alpha: 0.25)),
-          ),
+          padding: const EdgeInsets.all(22),
+          decoration: _panelDecoration(theme),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color),
+              ),
+              const SizedBox(height: 18),
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white38,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
                 '$value',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
@@ -511,40 +530,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String label,
     dynamic value,
     ThemeData theme,
-    Color color,
-  ) {
+    Color color, {
+    required IconData icon,
+  }) {
     return Expanded(
       child: HoverLiftCard(
         glowColor: color,
         child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withValues(alpha: 0.18),
-                color.withValues(alpha: 0.06),
-              ],
-            ),
-            border: Border.all(color: color.withValues(alpha: 0.25)),
-          ),
+          padding: const EdgeInsets.all(22),
+          decoration: _panelDecoration(theme),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color),
+              ),
+              const SizedBox(height: 18),
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white38,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
                 _formatAmount(value),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
@@ -556,23 +575,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildTrendToggle(ThemeData theme, dynamic l10n) {
     return Center(
-      child: SegmentedButton<String>(
-        segments: [
-          ButtonSegment(value: 'daily', label: Text(l10n.daily)),
-          ButtonSegment(value: 'weekly', label: Text(l10n.weekly)),
-          ButtonSegment(value: 'monthly', label: Text(l10n.monthly)),
-          ButtonSegment(value: 'yearly', label: Text(l10n.yearly)),
-        ],
-        selected: {_selectedPeriod},
-        onSelectionChanged: (selection) {
-          setState(() => _selectedPeriod = selection.first);
-          _load();
-        },
-        style: SegmentedButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          selectedBackgroundColor:
-              theme.colorScheme.primary.withValues(alpha: 0.2),
-          selectedForegroundColor: theme.colorScheme.primary,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0C102A43),
+              blurRadius: 18,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        child: SegmentedButton<String>(
+          segments: [
+            ButtonSegment(value: 'daily', label: Text(l10n.daily)),
+            ButtonSegment(value: 'weekly', label: Text(l10n.weekly)),
+            ButtonSegment(value: 'monthly', label: Text(l10n.monthly)),
+            ButtonSegment(value: 'yearly', label: Text(l10n.yearly)),
+          ],
+          selected: {_selectedPeriod},
+          onSelectionChanged: (selection) {
+            setState(() => _selectedPeriod = selection.first);
+            _load();
+          },
+          showSelectedIcon: false,
+          style: ButtonStyle(
+            visualDensity: VisualDensity.standard,
+            minimumSize: WidgetStateProperty.all(const Size(84, 46)),
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            ),
+            backgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return theme.colorScheme.primary;
+              }
+              return Colors.transparent;
+            }),
+            foregroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return theme.colorScheme.onPrimary;
+              }
+              return theme.colorScheme.onSurfaceVariant;
+            }),
+            textStyle: WidgetStateProperty.resolveWith((states) {
+              final selected = states.contains(WidgetState.selected);
+              return theme.textTheme.labelLarge?.copyWith(
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+              );
+            }),
+            side: WidgetStateProperty.all(BorderSide.none),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Colors.white.withValues(alpha: 0.08);
+              }
+              if (states.contains(WidgetState.pressed)) {
+                return theme.colorScheme.primary.withValues(alpha: 0.12);
+              }
+              if (states.contains(WidgetState.hovered)) {
+                return theme.colorScheme.primary.withValues(alpha: 0.08);
+              }
+              return Colors.transparent;
+            }),
+          ),
         ),
       ),
     );
@@ -602,12 +674,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.all(24),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(16),
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          boxShadow: _cardShadow,
         ),
         child: Text(
           l10n.scanToSeeCategories,
-          style: const TextStyle(color: Colors.white30),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
         ),
       );
     }
@@ -622,11 +696,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final colors = [
       theme.colorScheme.primary,
-      const Color(0xFF6C63FF),
-      const Color(0xFFFF6B6B),
-      const Color(0xFFFFD166),
-      const Color(0xFF06D6A0),
-      const Color(0xFFEF8354),
+      theme.colorScheme.secondary,
+      const Color(0xFF1F6FEB),
+      const Color(0xFF63C5DA),
+      const Color(0xFF2CB1BC),
+      const Color(0xFF486581),
     ];
 
     return Column(
@@ -646,7 +720,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     category,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   Text(
                     CurrencyFormat.formatAmount(
@@ -667,7 +744,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: percentage,
-                  backgroundColor: Colors.white.withValues(alpha: 0.06),
+                  backgroundColor:
+                      theme.colorScheme.primary.withValues(alpha: 0.08),
                   color: color,
                   minHeight: 6,
                 ),
@@ -686,12 +764,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.all(24),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(16),
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          boxShadow: _cardShadow,
         ),
         child: Text(
           l10n.scanToSeeTopSpots,
-          style: const TextStyle(color: Colors.white30),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
         ),
       );
     }
@@ -705,12 +785,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
 
     final colors = [
-      const Color(0xFF00E5CC),
-      const Color(0xFFFFD166),
-      const Color(0xFFEF8354),
+      theme.colorScheme.tertiary,
+      const Color(0xFF2CB1BC),
+      const Color(0xFF486581),
       theme.colorScheme.primary,
-      const Color(0xFF6C63FF),
-      const Color(0xFFFF6B6B),
+      theme.colorScheme.secondary,
+      const Color(0xFF1F6FEB),
     ];
 
     return Column(
@@ -730,7 +810,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     vendor,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   Text(
                     CurrencyFormat.formatAmount(
@@ -751,7 +834,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: percentage,
-                  backgroundColor: Colors.white.withValues(alpha: 0.06),
+                  backgroundColor:
+                      theme.colorScheme.primary.withValues(alpha: 0.08),
                   color: color,
                   minHeight: 6,
                 ),
@@ -768,7 +852,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       title,
       style: theme.textTheme.titleSmall?.copyWith(
         fontWeight: FontWeight.w600,
-        color: Colors.white70,
+        color: theme.colorScheme.onSurface,
       ),
     );
   }
