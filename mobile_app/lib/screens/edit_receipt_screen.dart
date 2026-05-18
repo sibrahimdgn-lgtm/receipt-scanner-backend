@@ -143,6 +143,8 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 600;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -175,7 +177,7 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(isCompact ? 16 : 24),
         child: Form(
           key: _formKey,
           child: Column(
@@ -195,31 +197,53 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                 icon: Icons.store,
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildField(
-                      controller: _dateCtrl,
-                      label: l10n.dateIso,
-                      icon: Icons.calendar_today,
+              isCompact
+                  ? Column(
+                      children: [
+                        _buildField(
+                          controller: _dateCtrl,
+                          label: l10n.dateIso,
+                          icon: Icons.calendar_today,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildField(
+                          controller: _currencyCtrl,
+                          label: CurrencyFormat.labelWithSymbol(
+                            l10n.currencyCode,
+                            currencyCode: _currencyCode,
+                            currencySymbol: _currencySymbol,
+                          ),
+                          icon: Icons.currency_exchange,
+                          onChanged: (_) => setState(() {}),
+                          uppercase: true,
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: _buildField(
+                            controller: _dateCtrl,
+                            label: l10n.dateIso,
+                            icon: Icons.calendar_today,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildField(
+                            controller: _currencyCtrl,
+                            label: CurrencyFormat.labelWithSymbol(
+                              l10n.currencyCode,
+                              currencyCode: _currencyCode,
+                              currencySymbol: _currencySymbol,
+                            ),
+                            icon: Icons.currency_exchange,
+                            onChanged: (_) => setState(() {}),
+                            uppercase: true,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildField(
-                      controller: _currencyCtrl,
-                      label: CurrencyFormat.labelWithSymbol(
-                        l10n.currencyCode,
-                        currencyCode: _currencyCode,
-                        currencySymbol: _currencySymbol,
-                      ),
-                      icon: Icons.currency_exchange,
-                      onChanged: (_) => setState(() {}),
-                      uppercase: true,
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 16),
               _buildField(
                 controller: _totalCtrl,
@@ -319,54 +343,101 @@ class _EditReceiptScreenState extends State<EditReceiptScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: TextFormField(
-                              initialValue: item['quantity']?.toString() ?? '1',
-                              keyboardType: TextInputType.number,
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: l10n.quantityShort,
-                              ),
-                              onChanged: (value) {
-                                item['quantity'] = double.tryParse(value) ?? 1;
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            flex: 2,
-                            child: TextFormField(
-                              initialValue:
-                                  item['total_price']?.toString() ?? '0',
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                decimal: true,
-                              ),
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: CurrencyFormat.labelWithSymbol(
-                                  l10n.price,
-                                  currencyCode: _currencyCode,
-                                  currencySymbol: _currencySymbol,
+                      isCompact
+                          ? Column(
+                              children: [
+                                TextFormField(
+                                  initialValue:
+                                      item['quantity']?.toString() ?? '1',
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: l10n.quantityShort,
+                                  ),
+                                  onChanged: (value) {
+                                    item['quantity'] =
+                                        double.tryParse(value) ?? 1;
+                                  },
                                 ),
-                              ),
-                              onChanged: (value) {
-                                item['total_price'] =
-                                    double.tryParse(value) ?? 0;
-                                _recalculateTotal();
-                                setState(() {});
-                              },
+                                const SizedBox(height: 12),
+                                TextFormField(
+                                  initialValue:
+                                      item['total_price']?.toString() ?? '0',
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: CurrencyFormat.labelWithSymbol(
+                                      l10n.price,
+                                      currencyCode: _currencyCode,
+                                      currencySymbol: _currencySymbol,
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    item['total_price'] =
+                                        double.tryParse(value) ?? 0;
+                                    _recalculateTotal();
+                                    setState(() {});
+                                  },
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: TextFormField(
+                                    initialValue:
+                                        item['quantity']?.toString() ?? '1',
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                    decoration: InputDecoration(
+                                      labelText: l10n.quantityShort,
+                                    ),
+                                    onChanged: (value) {
+                                      item['quantity'] =
+                                          double.tryParse(value) ?? 1;
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextFormField(
+                                    initialValue:
+                                        item['total_price']?.toString() ?? '0',
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                    decoration: InputDecoration(
+                                      labelText: CurrencyFormat.labelWithSymbol(
+                                        l10n.price,
+                                        currencyCode: _currencyCode,
+                                        currencySymbol: _currencySymbol,
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      item['total_price'] =
+                                          double.tryParse(value) ?? 0;
+                                      _recalculateTotal();
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
                         value: ReceiptCategories.normalize(

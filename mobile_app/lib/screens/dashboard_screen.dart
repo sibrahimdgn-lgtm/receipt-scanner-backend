@@ -163,6 +163,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 600;
+    final horizontalPadding = isCompact ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -174,10 +177,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             slivers: [
               SliverAppBar(
                 backgroundColor: theme.colorScheme.surface,
-                expandedHeight: 100,
+                expandedHeight: isCompact ? 92 : 100,
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
+                  titlePadding: EdgeInsets.only(
+                    left: horizontalPadding,
+                    bottom: 16,
+                  ),
                   title: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +245,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 )
               else ...[
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 36),
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    16,
+                    horizontalPadding,
+                    36,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       _reveal(0, _buildSpendingCards(theme, l10n)),
@@ -286,24 +297,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final summary = Map<String, dynamic>.from(
       _data?['summary'] as Map? ?? const {},
     );
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
+    final cards = [
+      _summaryCard(
+        l10n.totalSpend,
+        summary['total_spend'],
+        theme,
+        theme.colorScheme.primary,
+        icon: Icons.account_balance_wallet_rounded,
+      ),
+      _summaryCountCard(
+        l10n.totalReceipts,
+        summary['receipt_count'],
+        theme,
+        theme.colorScheme.secondary,
+        icon: Icons.receipt_long_rounded,
+      ),
+    ];
+
+    if (isCompact) {
+      return Column(
+        children: [
+          for (var i = 0; i < cards.length; i++) ...[
+            cards[i],
+            if (i != cards.length - 1) const SizedBox(height: 12),
+          ],
+        ],
+      );
+    }
 
     return Row(
       children: [
-        _summaryCard(
-          l10n.totalSpend,
-          summary['total_spend'],
-          theme,
-          theme.colorScheme.primary,
-          icon: Icons.account_balance_wallet_rounded,
-        ),
+        Expanded(child: cards[0]),
         const SizedBox(width: 16),
-        _summaryCountCard(
-          l10n.totalReceipts,
-          summary['receipt_count'],
-          theme,
-          theme.colorScheme.secondary,
-          icon: Icons.receipt_long_rounded,
-        ),
+        Expanded(child: cards[1]),
       ],
     );
   }
@@ -314,11 +341,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       currencyCode: _activeCurrencyCode,
       currencySymbol: _activeCurrencySymbol,
     );
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
 
     return HoverLiftCard(
       glowColor: theme.colorScheme.secondary,
       child: Container(
-        padding: const EdgeInsets.all(22),
+        padding: EdgeInsets.all(isCompact ? 16 : 22),
         decoration: _panelDecoration(theme),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,6 +394,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         totalSpend: 0,
                         receiptCount: 0,
                         isSelected: true,
+                        isCompact: isCompact,
                       ),
                     ]
                   : currencies.map((currency) {
@@ -392,6 +421,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         totalSpend: totalSpend,
                         receiptCount: receiptCount,
                         isSelected: code == _activeCurrencyCode,
+                        isCompact: isCompact,
                       );
                     }).toList(),
             ),
@@ -409,6 +439,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required double totalSpend,
     required int receiptCount,
     required bool isSelected,
+    required bool isCompact,
   }) {
     return InkWell(
       onTap: () => _changeCurrency(code),
@@ -423,7 +454,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         enablePress: true,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          width: 152,
+          width: isCompact ? double.infinity : 152,
           padding: const EdgeInsets.all(16),
           decoration: _panelDecoration(
             theme,
@@ -486,41 +517,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required IconData icon,
   }) {
     final value = int.tryParse(count?.toString() ?? '0') ?? 0;
-    return Expanded(
-      child: HoverLiftCard(
-        glowColor: color,
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: _panelDecoration(theme),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color),
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
+    return HoverLiftCard(
+      glowColor: color,
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 18 : 22),
+        decoration: _panelDecoration(theme),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 18),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(height: 10),
-              Text(
-                '$value',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
-                ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '$value',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -533,117 +563,128 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color color, {
     required IconData icon,
   }) {
-    return Expanded(
-      child: HoverLiftCard(
-        glowColor: color,
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: _panelDecoration(theme),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color),
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
+    return HoverLiftCard(
+      glowColor: color,
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 18 : 22),
+        decoration: _panelDecoration(theme),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 18),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(height: 10),
-              Text(
-                _formatAmount(value),
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
-                ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _formatAmount(value),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildTrendToggle(ThemeData theme, dynamic l10n) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: theme.colorScheme.outlineVariant),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0C102A43),
-              blurRadius: 18,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: SegmentedButton<String>(
-          segments: [
-            ButtonSegment(value: 'daily', label: Text(l10n.daily)),
-            ButtonSegment(value: 'weekly', label: Text(l10n.weekly)),
-            ButtonSegment(value: 'monthly', label: Text(l10n.monthly)),
-            ButtonSegment(value: 'yearly', label: Text(l10n.yearly)),
-          ],
-          selected: {_selectedPeriod},
-          onSelectionChanged: (selection) {
-            setState(() => _selectedPeriod = selection.first);
-            _load();
-          },
-          showSelectedIcon: false,
-          style: ButtonStyle(
-            visualDensity: VisualDensity.standard,
-            minimumSize: WidgetStateProperty.all(const Size(84, 46)),
-            padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-            ),
-            backgroundColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return theme.colorScheme.primary;
-              }
-              return Colors.transparent;
-            }),
-            foregroundColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return theme.colorScheme.onPrimary;
-              }
-              return theme.colorScheme.onSurfaceVariant;
-            }),
-            textStyle: WidgetStateProperty.resolveWith((states) {
-              final selected = states.contains(WidgetState.selected);
-              return theme.textTheme.labelLarge?.copyWith(
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-              );
-            }),
-            side: WidgetStateProperty.all(BorderSide.none),
-            shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: isCompact ? 4 : 0),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0C102A43),
+                blurRadius: 18,
+                offset: Offset(0, 10),
               ),
+            ],
+          ),
+          child: SegmentedButton<String>(
+            segments: [
+              ButtonSegment(value: 'daily', label: Text(l10n.daily)),
+              ButtonSegment(value: 'weekly', label: Text(l10n.weekly)),
+              ButtonSegment(value: 'monthly', label: Text(l10n.monthly)),
+              ButtonSegment(value: 'yearly', label: Text(l10n.yearly)),
+            ],
+            selected: {_selectedPeriod},
+            onSelectionChanged: (selection) {
+              setState(() => _selectedPeriod = selection.first);
+              _load();
+            },
+            showSelectedIcon: false,
+            style: ButtonStyle(
+              visualDensity:
+                  isCompact ? VisualDensity.compact : VisualDensity.standard,
+              minimumSize: WidgetStateProperty.all(
+                Size(isCompact ? 72 : 84, 46),
+              ),
+              padding: WidgetStateProperty.all(
+                EdgeInsets.symmetric(
+                  horizontal: isCompact ? 14 : 18,
+                  vertical: 12,
+                ),
+              ),
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return theme.colorScheme.primary;
+                }
+                return Colors.transparent;
+              }),
+              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return theme.colorScheme.onPrimary;
+                }
+                return theme.colorScheme.onSurfaceVariant;
+              }),
+              textStyle: WidgetStateProperty.resolveWith((states) {
+                final selected = states.contains(WidgetState.selected);
+                return theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                );
+              }),
+              side: WidgetStateProperty.all(BorderSide.none),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              overlayColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.white.withValues(alpha: 0.08);
+                }
+                if (states.contains(WidgetState.pressed)) {
+                  return theme.colorScheme.primary.withValues(alpha: 0.12);
+                }
+                if (states.contains(WidgetState.hovered)) {
+                  return theme.colorScheme.primary.withValues(alpha: 0.08);
+                }
+                return Colors.transparent;
+              }),
             ),
-            overlayColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return Colors.white.withValues(alpha: 0.08);
-              }
-              if (states.contains(WidgetState.pressed)) {
-                return theme.colorScheme.primary.withValues(alpha: 0.12);
-              }
-              if (states.contains(WidgetState.hovered)) {
-                return theme.colorScheme.primary.withValues(alpha: 0.08);
-              }
-              return Colors.transparent;
-            }),
           ),
         ),
       ),
@@ -669,6 +710,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildCategories(ThemeData theme, dynamic l10n) {
     final categories = (_data?['categories'] as List?) ?? const [];
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
     if (categories.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
@@ -716,15 +758,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    category,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Text(
+                      category,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: isCompact ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 12),
                   Text(
                     CurrencyFormat.formatAmount(
                       total,
@@ -759,6 +805,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildVendors(ThemeData theme, dynamic l10n) {
     final vendors = (_data?['vendors'] as List?) ?? const [];
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
     if (vendors.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
@@ -806,15 +853,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    vendor,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Text(
+                      vendor,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: isCompact ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 12),
                   Text(
                     CurrencyFormat.formatAmount(
                       total,

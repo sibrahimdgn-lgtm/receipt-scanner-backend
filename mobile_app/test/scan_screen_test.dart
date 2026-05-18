@@ -62,4 +62,22 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('scan actions stack vertically on narrow screens',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await pumpScanScreen(tester);
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final takePhotoPosition = tester.getTopLeft(find.text('Take Photo'));
+    final uploadPosition =
+        tester.getTopLeft(find.text('Upload JPG, PNG, or PDF'));
+
+    expect(uploadPosition.dy, greaterThan(takePhotoPosition.dy));
+    expect(tester.takeException(), isNull);
+  });
 }

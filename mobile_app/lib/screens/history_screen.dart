@@ -155,6 +155,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 600;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -186,26 +188,46 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: Center(
-                        child: OutlinedButton.icon(
-                          onPressed: _exportReceipts,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.primary,
-                            backgroundColor: theme.colorScheme.surface,
-                            side: BorderSide(
-                              color: theme.colorScheme.primary
-                                  .withValues(alpha: 0.28),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          icon: const Icon(Icons.download_rounded, size: 18),
-                          label: Text(l10n.exportCsv),
-                        ),
+                        child: isCompact
+                            ? IconButton(
+                                tooltip: l10n.exportCsv,
+                                onPressed: _exportReceipts,
+                                style: IconButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.surface,
+                                  foregroundColor: theme.colorScheme.primary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color: theme.colorScheme.primary
+                                          .withValues(alpha: 0.28),
+                                    ),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.download_rounded),
+                              )
+                            : OutlinedButton.icon(
+                                onPressed: _exportReceipts,
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: theme.colorScheme.primary,
+                                  backgroundColor: theme.colorScheme.surface,
+                                  side: BorderSide(
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.28),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.download_rounded,
+                                  size: 18,
+                                ),
+                                label: Text(l10n.exportCsv),
+                              ),
                       ),
                     ),
                   const LanguageSwitcherButton(
@@ -274,7 +296,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  padding: EdgeInsets.fromLTRB(
+                    isCompact ? 12 : 16,
+                    8,
+                    isCompact ? 12 : 16,
+                    24,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (ctx, index) => MotionReveal(
@@ -282,6 +309,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         child: _ReceiptCard(
                           receipt: _receipts[index],
                           onChanged: _load,
+                          isCompact: isCompact,
                         ),
                       ),
                       childCount: _receipts.length,
@@ -299,10 +327,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
 class _ReceiptCard extends StatefulWidget {
   final Map<String, dynamic> receipt;
   final Future<void> Function() onChanged;
+  final bool isCompact;
 
   const _ReceiptCard({
     required this.receipt,
     required this.onChanged,
+    required this.isCompact,
   });
 
   @override
@@ -359,72 +389,159 @@ class _ReceiptCardState extends State<_ReceiptCard> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            theme.colorScheme.primary.withValues(alpha: 0.12),
-                      ),
-                      child: Icon(
-                        Icons.receipt_rounded,
-                        color: theme.colorScheme.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
+                padding: EdgeInsets.all(widget.isCompact ? 14 : 16),
+                child: widget.isCompact
+                    ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            vendor,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: theme.colorScheme.primary
+                                      .withValues(alpha: 0.12),
+                                ),
+                                child: Icon(
+                                  Icons.receipt_rounded,
+                                  color: theme.colorScheme.primary,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      vendor,
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.onSurface,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '$date  ·  ${l10n.itemCountLabel(itemCount)}',
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      CurrencyFormat.codeWithSymbol(
+                                        currencyCode: currencyCode,
+                                        currencySymbol: currencySymbol,
+                                      ),
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                _expanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: theme.colorScheme.onSurfaceVariant,
+                                size: 18,
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 10),
                           Text(
-                            '$date  ·  ${l10n.itemCountLabel(itemCount)}  ·  ${CurrencyFormat.codeWithSymbol(currencyCode: currencyCode, currencySymbol: currencySymbol)}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                            CurrencyFormat.formatAmount(
+                              total,
+                              currencyCode: currencyCode,
+                              currencySymbol: currencySymbol,
+                            ),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
                             ),
                           ),
                         ],
+                      )
+                    : Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.12),
+                            ),
+                            child: Icon(
+                              Icons.receipt_rounded,
+                              color: theme.colorScheme.primary,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  vendor,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurface,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '$date  ·  ${l10n.itemCountLabel(itemCount)}  ·  ${CurrencyFormat.codeWithSymbol(currencyCode: currencyCode, currencySymbol: currencySymbol)}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                CurrencyFormat.formatAmount(
+                                  total,
+                                  currencyCode: currencyCode,
+                                  currencySymbol: currencySymbol,
+                                ),
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Icon(
+                                _expanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: theme.colorScheme.onSurfaceVariant,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          CurrencyFormat.formatAmount(
-                            total,
-                            currencyCode: currencyCode,
-                            currencySymbol: currencySymbol,
-                          ),
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Icon(
-                          _expanded ? Icons.expand_less : Icons.expand_more,
-                          color: theme.colorScheme.onSurfaceVariant,
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
               ),
               ClipRect(
                 child: AnimatedSize(
@@ -433,9 +550,14 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                   child: _expanded
                       ? Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          padding: EdgeInsets.fromLTRB(
+                            widget.isCompact ? 14 : 16,
+                            0,
+                            widget.isCompact ? 14 : 16,
+                            16,
+                          ),
                           child: Container(
-                            padding: const EdgeInsets.all(14),
+                            padding: EdgeInsets.all(widget.isCompact ? 12 : 14),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surfaceContainerHighest
                                   .withValues(alpha: 0.35),
@@ -447,31 +569,60 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    _statCell(l10n.items, '$itemCount', theme),
-                                    _divider(),
-                                    _statCell(
-                                      l10n.total,
-                                      CurrencyFormat.formatAmount(
-                                        total,
-                                        currencyCode: currencyCode,
-                                        currencySymbol: currencySymbol,
+                                widget.isCompact
+                                    ? Wrap(
+                                        spacing: 10,
+                                        runSpacing: 10,
+                                        children: [
+                                          _compactStatChip(
+                                            l10n.items,
+                                            '$itemCount',
+                                            theme,
+                                          ),
+                                          _compactStatChip(
+                                            l10n.total,
+                                            CurrencyFormat.formatAmount(
+                                              total,
+                                              currencyCode: currencyCode,
+                                              currencySymbol: currencySymbol,
+                                            ),
+                                            theme,
+                                          ),
+                                          _compactStatChip(
+                                            l10n.date,
+                                            date.length >= 10
+                                                ? date.substring(0, 10)
+                                                : date,
+                                            theme,
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          _statCell(
+                                              l10n.items, '$itemCount', theme),
+                                          _divider(),
+                                          _statCell(
+                                            l10n.total,
+                                            CurrencyFormat.formatAmount(
+                                              total,
+                                              currencyCode: currencyCode,
+                                              currencySymbol: currencySymbol,
+                                            ),
+                                            theme,
+                                          ),
+                                          _divider(),
+                                          _statCell(
+                                            l10n.date,
+                                            date.length >= 10
+                                                ? date.substring(0, 10)
+                                                : date,
+                                            theme,
+                                          ),
+                                        ],
                                       ),
-                                      theme,
-                                    ),
-                                    _divider(),
-                                    _statCell(
-                                      l10n.date,
-                                      date.length >= 10
-                                          ? date.substring(0, 10)
-                                          : date,
-                                      theme,
-                                    ),
-                                  ],
-                                ),
                                 const SizedBox(height: 16),
                                 Container(
                                   height: 1,
@@ -498,72 +649,125 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                     );
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 8),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${quantity.toInt()}x',
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                              color: theme
-                                                  .colorScheme.onSurfaceVariant,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
+                                      child: widget.isCompact
+                                          ? Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  lineItem['item_name']
-                                                          ?.toString() ??
-                                                      l10n.unknownItem,
+                                                  '${quantity.toInt()}x ${lineItem['item_name']?.toString() ?? l10n.unknownItem}',
                                                   style: theme
                                                       .textTheme.bodySmall
                                                       ?.copyWith(
                                                     color: theme
                                                         .colorScheme.onSurface,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
+                                                const SizedBox(height: 2),
                                                 if (formattedTransactionDate !=
                                                     null)
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                      top: 2,
-                                                    ),
-                                                    child: Text(
-                                                      formattedTransactionDate,
-                                                      style: theme
-                                                          .textTheme.bodySmall
-                                                          ?.copyWith(
-                                                        color: theme.colorScheme
-                                                            .onSurfaceVariant,
-                                                      ),
+                                                  Text(
+                                                    formattedTransactionDate,
+                                                    style: theme
+                                                        .textTheme.bodySmall
+                                                        ?.copyWith(
+                                                      color: theme.colorScheme
+                                                          .onSurfaceVariant,
                                                     ),
                                                   ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  CurrencyFormat.formatAmount(
+                                                    price,
+                                                    currencyCode: currencyCode,
+                                                    currencySymbol:
+                                                        currencySymbol,
+                                                  ),
+                                                  style: theme
+                                                      .textTheme.bodySmall
+                                                      ?.copyWith(
+                                                    color: theme
+                                                        .colorScheme.onSurface,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${quantity.toInt()}x',
+                                                  style: theme
+                                                      .textTheme.bodySmall
+                                                      ?.copyWith(
+                                                    color: theme.colorScheme
+                                                        .onSurfaceVariant,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        lineItem['item_name']
+                                                                ?.toString() ??
+                                                            l10n.unknownItem,
+                                                        style: theme
+                                                            .textTheme.bodySmall
+                                                            ?.copyWith(
+                                                          color: theme
+                                                              .colorScheme
+                                                              .onSurface,
+                                                        ),
+                                                      ),
+                                                      if (formattedTransactionDate !=
+                                                          null)
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            top: 2,
+                                                          ),
+                                                          child: Text(
+                                                            formattedTransactionDate,
+                                                            style: theme
+                                                                .textTheme
+                                                                .bodySmall
+                                                                ?.copyWith(
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .onSurfaceVariant,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  CurrencyFormat.formatAmount(
+                                                    price,
+                                                    currencyCode: currencyCode,
+                                                    currencySymbol:
+                                                        currencySymbol,
+                                                  ),
+                                                  style: theme
+                                                      .textTheme.bodySmall
+                                                      ?.copyWith(
+                                                    color: theme
+                                                        .colorScheme.onSurface,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
                                               ],
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            CurrencyFormat.formatAmount(
-                                              price,
-                                              currencyCode: currencyCode,
-                                              currencySymbol: currencySymbol,
-                                            ),
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                              color:
-                                                  theme.colorScheme.onSurface,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     );
                                   }))
                                 else
@@ -581,127 +785,152 @@ class _ReceiptCardState extends State<_ReceiptCard> {
                                     ),
                                   ),
                                 const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        icon: const Icon(Icons.edit_note,
-                                            size: 18),
-                                        label: Text(l10n.editReceiptData),
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor:
-                                              theme.colorScheme.primary,
-                                          side: BorderSide(
-                                            color: theme.colorScheme.primary
-                                                .withValues(alpha: 0.3),
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12),
-                                        ),
-                                        onPressed: () async {
-                                          final result = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => EditReceiptScreen(
-                                                  receipt: receipt),
-                                            ),
-                                          );
-                                          if (result == true) {
-                                            await widget.onChanged();
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: Colors.redAccent,
-                                        side: BorderSide(
-                                          color: Colors.redAccent
-                                              .withValues(alpha: 0.3),
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 16,
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        final confirm = await showDialog<bool>(
-                                          context: context,
-                                          builder: (ctx) => AlertDialog(
-                                            backgroundColor:
-                                                theme.colorScheme.surface,
-                                            title: Text(
-                                              l10n.deleteReceiptTitle,
-                                              style: TextStyle(
-                                                color:
-                                                    theme.colorScheme.onSurface,
+                                widget.isCompact
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          OutlinedButton.icon(
+                                            icon: const Icon(Icons.edit_note,
+                                                size: 18),
+                                            label: Text(l10n.editReceiptData),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor:
+                                                  theme.colorScheme.primary,
+                                              side: BorderSide(
+                                                color: theme.colorScheme.primary
+                                                    .withValues(alpha: 0.3),
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 12,
                                               ),
                                             ),
-                                            content: Text(
-                                              l10n.deleteReceiptBody,
-                                              style: TextStyle(
-                                                color: theme.colorScheme
-                                                    .onSurfaceVariant,
-                                              ),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.pop(ctx, false),
-                                                child: Text(
-                                                  l10n.cancel,
-                                                  style: TextStyle(
-                                                    color: theme.colorScheme
-                                                        .onSurfaceVariant,
+                                            onPressed: () async {
+                                              final result =
+                                                  await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      EditReceiptScreen(
+                                                    receipt: receipt,
                                                   ),
-                                                ),
-                                              ),
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.pop(ctx, true),
-                                                child: Text(
-                                                  l10n.delete,
-                                                  style: const TextStyle(
-                                                    color: Colors.redAccent,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                        if (confirm == true) {
-                                          try {
-                                            await DashboardService.instance
-                                                .deleteReceipt(
-                                                    receipt['receipt_id']);
-                                            await widget.onChanged();
-                                          } catch (_) {
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(l10n
-                                                      .failedToDeleteReceipt),
                                                 ),
                                               );
-                                            }
-                                          }
-                                        }
-                                      },
-                                      child: const Icon(Icons.delete_outline,
-                                          size: 20),
-                                    ),
-                                  ],
-                                ),
+                                              if (result == true) {
+                                                await widget.onChanged();
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(height: 10),
+                                          OutlinedButton.icon(
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                              size: 18,
+                                            ),
+                                            label: Text(l10n.delete),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: Colors.redAccent,
+                                              side: BorderSide(
+                                                color: Colors.redAccent
+                                                    .withValues(alpha: 0.3),
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 12,
+                                              ),
+                                            ),
+                                            onPressed: () =>
+                                                _confirmDeleteReceipt(
+                                              context,
+                                              theme,
+                                              l10n,
+                                              receipt,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        children: [
+                                          Expanded(
+                                            child: OutlinedButton.icon(
+                                              icon: const Icon(Icons.edit_note,
+                                                  size: 18),
+                                              label: Text(l10n.editReceiptData),
+                                              style: OutlinedButton.styleFrom(
+                                                foregroundColor:
+                                                    theme.colorScheme.primary,
+                                                side: BorderSide(
+                                                  color: theme
+                                                      .colorScheme.primary
+                                                      .withValues(alpha: 0.3),
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  vertical: 12,
+                                                ),
+                                              ),
+                                              onPressed: () async {
+                                                final result =
+                                                    await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        EditReceiptScreen(
+                                                      receipt: receipt,
+                                                    ),
+                                                  ),
+                                                );
+                                                if (result == true) {
+                                                  await widget.onChanged();
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          OutlinedButton(
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: Colors.redAccent,
+                                              side: BorderSide(
+                                                color: Colors.redAccent
+                                                    .withValues(alpha: 0.3),
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 12,
+                                                horizontal: 16,
+                                              ),
+                                            ),
+                                            onPressed: () =>
+                                                _confirmDeleteReceipt(
+                                              context,
+                                              theme,
+                                              l10n,
+                                              receipt,
+                                            ),
+                                            child: const Icon(
+                                              Icons.delete_outline,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                               ],
                             ),
                           ),
@@ -744,4 +973,95 @@ class _ReceiptCardState extends State<_ReceiptCard> {
         height: 30,
         color: Theme.of(context).colorScheme.outlineVariant,
       );
+
+  Widget _compactStatChip(String label, String value, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteReceipt(
+    BuildContext context,
+    ThemeData theme,
+    dynamic l10n,
+    Map<String, dynamic> receipt,
+  ) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        title: Text(
+          l10n.deleteReceiptTitle,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        content: Text(
+          l10n.deleteReceiptBody,
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              l10n.delete,
+              style: TextStyle(
+                color: Colors.redAccent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      try {
+        await DashboardService.instance.deleteReceipt(receipt['receipt_id']);
+        await widget.onChanged();
+      } catch (_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.failedToDeleteReceipt),
+            ),
+          );
+        }
+      }
+    }
+  }
 }

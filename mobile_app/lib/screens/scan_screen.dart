@@ -264,6 +264,9 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 600;
+    final horizontalPadding = isCompact ? 16.0 : 24.0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -271,14 +274,15 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         child: SafeArea(
           child: Column(
             children: [
-              const SizedBox(height: 24),
+              SizedBox(height: isCompact ? 16 : 24),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 42,
-                      height: 42,
+                      width: isCompact ? 38 : 42,
+                      height: isCompact ? 38 : 42,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         color: theme.colorScheme.primary,
@@ -296,7 +300,10 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                         children: [
                           Text(
                             l10n.appTitle,
-                            style: theme.textTheme.titleMedium?.copyWith(
+                            style: (isCompact
+                                    ? theme.textTheme.titleSmall
+                                    : theme.textTheme.titleMedium)
+                                ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.onSurface,
                             ),
@@ -450,8 +457,8 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               Expanded(
                 child: Center(
                   child: _isProcessing
-                      ? _buildLoadingState(theme, l10n)
-                      : _buildIdleState(theme, l10n),
+                      ? _buildLoadingState(theme, l10n, isCompact: isCompact)
+                      : _buildIdleState(theme, l10n, isCompact: isCompact),
                 ),
               ),
             ],
@@ -461,13 +468,18 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildIdleState(ThemeData theme, dynamic l10n) {
+  Widget _buildIdleState(
+    ThemeData theme,
+    dynamic l10n, {
+    required bool isCompact,
+  }) {
     final selectedFile = _selectedFile;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+      padding: EdgeInsets.fromLTRB(
+          isCompact ? 16 : 24, 0, isCompact ? 16 : 24, isCompact ? 24 : 32),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
+        constraints: BoxConstraints(maxWidth: isCompact ? 420 : 560),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -476,7 +488,10 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               Text(
                 l10n.scanReceiptTitle,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.headlineMedium?.copyWith(
+                style: (isCompact
+                        ? theme.textTheme.headlineSmall
+                        : theme.textTheme.headlineMedium)
+                    ?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.onSurface,
                 ),
@@ -560,45 +575,11 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
             const SizedBox(height: 28),
             _reveal(
               3,
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.center,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: _pickCameraReceipt,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: theme.colorScheme.onSurface,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    icon: Icon(
-                      kIsWeb
-                          ? Icons.videocam_rounded
-                          : Icons.camera_alt_rounded,
-                    ),
-                    label: Text(kIsWeb ? l10n.openCamera : l10n.takePhoto),
-                  ),
-                  FilledButton.icon(
-                    onPressed: _pickUploadReceipt,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    icon: const Icon(Icons.upload_file_rounded),
-                    label: Text(l10n.uploadReceiptFile),
-                  ),
-                ],
+              _buildPrimaryActions(
+                theme,
+                l10n,
+                isCompact: isCompact,
+                selectedFile: false,
               ),
             ),
             const SizedBox(height: 28),
@@ -621,60 +602,11 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
               const SizedBox(height: 18),
               _reveal(
                 5,
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: _pickCameraReceipt,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.onSurface,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: Icon(
-                        kIsWeb
-                            ? Icons.videocam_rounded
-                            : Icons.camera_alt_rounded,
-                      ),
-                      label: Text(kIsWeb ? l10n.openCamera : l10n.takePhoto),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: _pickUploadReceipt,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.onSurface,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: Text(l10n.changeFile),
-                    ),
-                    FilledButton.icon(
-                      onPressed: _submitSelectedFile,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: const Icon(Icons.auto_awesome_rounded),
-                      label: Text(l10n.analyzeSelectedFile),
-                    ),
-                  ],
+                _buildPrimaryActions(
+                  theme,
+                  l10n,
+                  isCompact: isCompact,
+                  selectedFile: true,
                 ),
               ),
             ],
@@ -826,7 +758,11 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildLoadingState(ThemeData theme, dynamic l10n) {
+  Widget _buildLoadingState(
+    ThemeData theme,
+    dynamic l10n, {
+    required bool isCompact,
+  }) {
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
@@ -843,7 +779,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 24),
             SizedBox(
-              width: 220,
+              width: isCompact ? 180 : 220,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: LinearProgressIndicator(
@@ -856,6 +792,93 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildPrimaryActions(
+    ThemeData theme,
+    dynamic l10n, {
+    required bool isCompact,
+    required bool selectedFile,
+  }) {
+    final cameraButton = OutlinedButton.icon(
+      onPressed: _pickCameraReceipt,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: theme.colorScheme.onSurface,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      icon: Icon(
+        kIsWeb ? Icons.videocam_rounded : Icons.camera_alt_rounded,
+      ),
+      label: Text(kIsWeb ? l10n.openCamera : l10n.takePhoto),
+    );
+
+    final uploadButton = FilledButton.icon(
+      onPressed: selectedFile ? _submitSelectedFile : _pickUploadReceipt,
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      icon: Icon(
+        selectedFile ? Icons.auto_awesome_rounded : Icons.upload_file_rounded,
+      ),
+      label: Text(
+        selectedFile ? l10n.analyzeSelectedFile : l10n.uploadReceiptFile,
+      ),
+    );
+
+    final changeFileButton = selectedFile
+        ? OutlinedButton.icon(
+            onPressed: _pickUploadReceipt,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurface,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 16,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            icon: const Icon(Icons.refresh_rounded),
+            label: Text(l10n.changeFile),
+          )
+        : null;
+
+    final buttons = [
+      cameraButton,
+      if (changeFileButton != null) changeFileButton,
+      uploadButton,
+    ];
+
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < buttons.length; i++) ...[
+            SizedBox(width: double.infinity, child: buttons[i]),
+            if (i != buttons.length - 1) const SizedBox(height: 12),
+          ],
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      alignment: WrapAlignment.center,
+      children: buttons,
     );
   }
 }

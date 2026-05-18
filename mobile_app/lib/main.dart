@@ -474,6 +474,7 @@ class _MainShellState extends State<MainShell>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
 
     return AnimatedBuilder(
       animation: AuthService.instance,
@@ -500,7 +501,12 @@ class _MainShellState extends State<MainShell>
           child: SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              padding: EdgeInsets.fromLTRB(
+                isCompact ? 10 : 16,
+                10,
+                isCompact ? 10 : 16,
+                12,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
