@@ -46,6 +46,7 @@
 - `mobile_app/lib/widgets/language_switcher_button.dart`: shared language selector
 - `mobile_app/lib/widgets/live_camera_capture_dialog_web.dart`: browser camera permission + live capture sheet
 - `mobile_app/lib/widgets/live_camera_capture_dialog_stub.dart`: non-web fallback for the live capture sheet import
+- `mobile_app/lib/widgets/scan_feedback_widgets.dart`: polished scan loading card and soft success/error status banners
 - `mobile_app/lib/l10n/*.arb`: localization source files
 
 ## Planning

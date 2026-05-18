@@ -139,10 +139,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get retry => 'Erneut versuchen';
 
   @override
-  String get analyzingReceipt => 'Beleg wird analysiert...';
+  String get analyzingReceipt => 'Belegdetails werden mit KI analysiert...';
 
   @override
-  String get analyzingReceiptBody => 'Gemini AI extrahiert die Daten';
+  String get analyzingReceiptBody =>
+      'Das dauert meist nur ein paar Sekunden. Bitte lasse diesen Bildschirm geöffnet.';
+
+  @override
+  String get receiptScannedAndSaved =>
+      'Beleg wurde erfolgreich gescannt und gespeichert.';
+
+  @override
+  String get scanFailedTryAgain =>
+      'Die Analyse ist fehlgeschlagen. Bitte versuche es erneut.';
 
   @override
   String get welcomeBack => 'Willkommen zurueck';

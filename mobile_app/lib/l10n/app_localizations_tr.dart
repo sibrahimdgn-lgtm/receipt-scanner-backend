@@ -138,10 +138,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get retry => 'Tekrar Dene';
 
   @override
-  String get analyzingReceipt => 'Fiş analiz ediliyor...';
+  String get analyzingReceipt =>
+      'Fiş detayları yapay zeka ile analiz ediliyor...';
 
   @override
-  String get analyzingReceiptBody => 'Gemini AI verileri çıkartıyor';
+  String get analyzingReceiptBody =>
+      'Bu işlem genelde birkaç saniye sürer. Lütfen bu ekranı açık tut.';
+
+  @override
+  String get receiptScannedAndSaved => 'Fiş başarıyla tarandı ve kaydedildi.';
+
+  @override
+  String get scanFailedTryAgain =>
+      'Tarama başarısız oldu, lütfen tekrar deneyin.';
 
   @override
   String get welcomeBack => 'Tekrar hoş geldin';

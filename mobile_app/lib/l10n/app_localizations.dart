@@ -345,14 +345,26 @@ abstract class AppLocalizations {
   /// No description provided for @analyzingReceipt.
   ///
   /// In en, this message translates to:
-  /// **'Analyzing receipt...'**
+  /// **'Receipt details are being analyzed by AI...'**
   String get analyzingReceipt;
 
   /// No description provided for @analyzingReceiptBody.
   ///
   /// In en, this message translates to:
-  /// **'Gemini AI is extracting the data'**
+  /// **'This usually takes a few seconds. Please keep this screen open.'**
   String get analyzingReceiptBody;
+
+  /// No description provided for @receiptScannedAndSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt scanned and saved successfully.'**
+  String get receiptScannedAndSaved;
+
+  /// No description provided for @scanFailedTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning failed. Please try again.'**
+  String get scanFailedTryAgain;
 
   /// No description provided for @welcomeBack.
   ///

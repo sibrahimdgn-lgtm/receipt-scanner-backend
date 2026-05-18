@@ -12,6 +12,7 @@ import '../widgets/live_camera_capture_dialog_stub.dart'
     if (dart.library.html) '../widgets/live_camera_capture_dialog_web.dart';
 import '../widgets/motion_reveal.dart';
 import '../widgets/result_dialog.dart';
+import '../widgets/scan_feedback_widgets.dart';
 import 'login_screen.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -96,6 +97,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
 
   Future<void> _submitSelectedFile() async {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
     final selectedFile = _selectedFile;
     if (selectedFile == null) {
       return;
@@ -107,9 +109,17 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
       final result = await ReceiptApiService.instance.scanReceipt(selectedFile);
 
       if (mounted) {
+        final wasLoggedIn = AuthService.instance.isLoggedIn;
         await ResultDialog.show(context, result);
         if (mounted) {
           setState(() => _selectedFile = null);
+        }
+        if (mounted && wasLoggedIn) {
+          _showStatusSnackBar(
+            message: l10n.receiptScannedAndSaved,
+            icon: Icons.check_circle_rounded,
+            accentColor: theme.colorScheme.primary,
+          );
         }
         if (mounted && !AuthService.instance.isLoggedIn) {
           AuthService.instance.pendingGuestReceipt = result.toJson();
@@ -118,20 +128,12 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: Colors.redAccent.shade700,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            action: SnackBarAction(
-              label: l10n.retry,
-              textColor: Colors.white,
-              onPressed: _submitSelectedFile,
-            ),
-          ),
+        _showStatusSnackBar(
+          message: l10n.scanFailedTryAgain,
+          icon: Icons.error_outline_rounded,
+          accentColor: theme.colorScheme.error,
+          actionLabel: l10n.retry,
+          onAction: _submitSelectedFile,
         );
       }
     } finally {
@@ -139,6 +141,35 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         setState(() => _isProcessing = false);
       }
     }
+  }
+
+  void _showStatusSnackBar({
+    required String message,
+    required IconData icon,
+    required Color accentColor,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          padding: EdgeInsets.zero,
+          duration: const Duration(seconds: 4),
+          content: ScanStatusBanner(
+            message: message,
+            icon: icon,
+            accentColor: accentColor,
+            actionLabel: actionLabel,
+            onAction: onAction,
+          ),
+        ),
+      );
   }
 
   void _showGuestNudge() {
@@ -799,51 +830,27 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
+        final normalizedPulse =
+            ((_pulseAnimation.value - 0.85) / 0.15).clamp(0.0, 1.0);
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Transform.scale(
-              scale: _pulseAnimation.value,
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                  border: Border.all(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                    width: 2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.auto_awesome_rounded,
-                  color: theme.colorScheme.primary,
-                  size: 42,
-                ),
-              ),
+            ReceiptAnalysisLoadingCard(
+              title: l10n.analyzingReceipt,
+              subtitle: l10n.analyzingReceiptBody,
+              pulseValue: normalizedPulse,
             ),
-            const SizedBox(height: 32),
-            Text(
-              l10n.analyzingReceipt,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.analyzingReceiptBody,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             SizedBox(
-              width: 200,
-              child: LinearProgressIndicator(
-                backgroundColor: theme.colorScheme.outlineVariant,
-                borderRadius: BorderRadius.circular(4),
-                color: theme.colorScheme.primary,
+              width: 220,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  minHeight: 6,
+                  backgroundColor: theme.colorScheme.outlineVariant,
+                  color: theme.colorScheme.primary,
+                ),
               ),
             ),
           ],
