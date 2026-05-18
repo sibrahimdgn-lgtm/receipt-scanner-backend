@@ -59,6 +59,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erstelle ein kostenloses Konto, um diesen Beleg zu speichern und deine taeglichen, woechentlichen, monatlichen und jaehrlichen Ausgaben zu verfolgen.';
 
   @override
+  String get exportCsv => 'CSV exportieren';
+
+  @override
+  String get receiptExportDownloaded =>
+      'Belegbericht wurde erfolgreich heruntergeladen.';
+
+  @override
+  String get receiptExportFailed =>
+      'Der Belegbericht konnte nicht heruntergeladen werden.';
+
+  @override
   String get scanReceiptTitle => 'Beleg scannen';
 
   @override
@@ -370,6 +381,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get currencyCode => 'Waehrungscode';
+
+  @override
+  String get currencySymbolLabel => 'Waehrungssymbol';
 
   @override
   String get currencyCodeHint =>

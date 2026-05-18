@@ -198,6 +198,24 @@ abstract class AppLocalizations {
   /// **'Create a free account to save this receipt and track your daily, weekly, monthly and yearly spending.'**
   String get saveAndTrackSpendingBody;
 
+  /// No description provided for @exportCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Export CSV'**
+  String get exportCsv;
+
+  /// No description provided for @receiptExportDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt report downloaded successfully.'**
+  String get receiptExportDownloaded;
+
+  /// No description provided for @receiptExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt report could not be downloaded.'**
+  String get receiptExportFailed;
+
   /// No description provided for @scanReceiptTitle.
   ///
   /// In en, this message translates to:
@@ -773,6 +791,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Currency Code'**
   String get currencyCode;
+
+  /// No description provided for @currencySymbolLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Symbol'**
+  String get currencySymbolLabel;
 
   /// No description provided for @currencyCodeHint.
   ///

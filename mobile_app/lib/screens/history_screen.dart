@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../config/receipt_categories.dart';
 import '../l10n/l10n.dart';
 import '../services/auth_service.dart';
+import '../services/csv_download_service.dart';
 import '../services/dashboard_service.dart';
 import '../utils/currency_format.dart';
+import '../utils/history_csv_export.dart';
 import '../utils/receipt_date_format.dart';
 import '../widgets/animated_backdrop.dart';
 import '../widgets/hover_lift_card.dart';
 import '../widgets/language_switcher_button.dart';
 import '../widgets/motion_reveal.dart';
+import '../widgets/scan_feedback_widgets.dart';
 import 'edit_receipt_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -70,6 +74,83 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
+  Future<void> _exportReceipts() async {
+    if (_receipts.isEmpty) {
+      return;
+    }
+
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+
+    try {
+      final csv = buildHistoryCsv(
+        _receipts,
+        headers: HistoryCsvHeaders(
+          date: l10n.date,
+          vendorName: l10n.vendorName,
+          categories: l10n.category,
+          totalAmount: l10n.total,
+          currencyCode: l10n.currencyCode,
+          currencySymbol: l10n.currencySymbolLabel,
+          itemCount: l10n.items,
+          receiptId: 'receipt_id',
+        ),
+        categoryLabelFor: (value) => ReceiptCategories.labelFor(context, value),
+      );
+
+      final dateLabel = DateTime.now().toIso8601String().split('T').first;
+      await downloadCsvFile(
+        filename: 'receipt-history-$dateLabel.csv',
+        csvContent: csv,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      _showStatusSnackBar(
+        message: l10n.receiptExportDownloaded,
+        icon: Icons.download_done_rounded,
+        accentColor: theme.colorScheme.primary,
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      _showStatusSnackBar(
+        message: l10n.receiptExportFailed,
+        icon: Icons.error_outline_rounded,
+        accentColor: theme.colorScheme.error,
+      );
+    }
+  }
+
+  void _showStatusSnackBar({
+    required String message,
+    required IconData icon,
+    required Color accentColor,
+  }) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          padding: EdgeInsets.zero,
+          duration: const Duration(seconds: 4),
+          content: ScanStatusBanner(
+            message: message,
+            icon: icon,
+            accentColor: accentColor,
+          ),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -97,8 +178,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
                 ),
-                actions: const [
-                  LanguageSwitcherButton(
+                actions: [
+                  if (AuthService.instance.isLoggedIn &&
+                      !_loading &&
+                      _error == null &&
+                      _receipts.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Center(
+                        child: OutlinedButton.icon(
+                          onPressed: _exportReceipts,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: theme.colorScheme.primary,
+                            backgroundColor: theme.colorScheme.surface,
+                            side: BorderSide(
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.28),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          icon: const Icon(Icons.download_rounded, size: 18),
+                          label: Text(l10n.exportCsv),
+                        ),
+                      ),
+                    ),
+                  const LanguageSwitcherButton(
                     margin: EdgeInsets.only(right: 12),
                   ),
                 ],

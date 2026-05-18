@@ -59,6 +59,15 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu fişi kaydetmek ve günlük, haftalık, aylık ve yıllık harcamanı takip etmek için ücretsiz hesap oluştur.';
 
   @override
+  String get exportCsv => 'CSV Dışa Aktar';
+
+  @override
+  String get receiptExportDownloaded => 'Fiş dökümü başarıyla indirildi.';
+
+  @override
+  String get receiptExportFailed => 'Fiş dökümü indirilemedi.';
+
+  @override
   String get scanReceiptTitle => 'Fiş Tara';
 
   @override
@@ -365,6 +374,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get currencyCode => 'Para Birimi Kodu';
+
+  @override
+  String get currencySymbolLabel => 'Para Birimi Sembolü';
 
   @override
   String get currencyCodeHint =>

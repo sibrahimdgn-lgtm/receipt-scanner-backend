@@ -59,6 +59,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Create a free account to save this receipt and track your daily, weekly, monthly and yearly spending.';
 
   @override
+  String get exportCsv => 'Export CSV';
+
+  @override
+  String get receiptExportDownloaded =>
+      'Receipt report downloaded successfully.';
+
+  @override
+  String get receiptExportFailed => 'Receipt report could not be downloaded.';
+
+  @override
   String get scanReceiptTitle => 'Scan a Receipt';
 
   @override
@@ -364,6 +374,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyCode => 'Currency Code';
+
+  @override
+  String get currencySymbolLabel => 'Currency Symbol';
 
   @override
   String get currencyCodeHint =>

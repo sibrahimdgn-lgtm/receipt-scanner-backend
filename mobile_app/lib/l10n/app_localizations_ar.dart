@@ -59,6 +59,15 @@ class AppLocalizationsAr extends AppLocalizations {
       'أنشئ حسابًا مجانيًا لحفظ هذا الإيصال ومتابعة مصروفاتك اليومية والأسبوعية والشهرية والسنوية.';
 
   @override
+  String get exportCsv => 'تصدير CSV';
+
+  @override
+  String get receiptExportDownloaded => 'تم تنزيل تقرير الإيصالات بنجاح.';
+
+  @override
+  String get receiptExportFailed => 'تعذر تنزيل تقرير الإيصالات.';
+
+  @override
   String get scanReceiptTitle => 'امسح إيصالًا';
 
   @override
@@ -365,6 +374,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get currencyCode => 'رمز العملة';
+
+  @override
+  String get currencySymbolLabel => 'رمز العملة';
 
   @override
   String get currencyCodeHint =>
