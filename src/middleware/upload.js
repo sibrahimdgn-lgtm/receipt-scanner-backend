@@ -1,6 +1,6 @@
 /**
  * Multer configuration for receipt file uploads.
- * Uses memory storage so the buffer can be sent directly to Gemini.
+ * Uses memory storage so the buffer can be sent directly to the vision model.
  */
 
 const multer = require('multer');

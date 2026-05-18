@@ -6,12 +6,12 @@
 - Primary data store: Firestore
 - Receipt file store: Firebase Cloud Storage
 - Client auth: Firebase Auth
-- AI extraction: Gemini API
+- AI extraction: Alibaba Qwen Vision API
 
 ## Backend Environment
 
 Required:
-- `GEMINI_API_KEY`
+- `QWEN_API_KEY`
 - `FIREBASE_STORAGE_BUCKET`
 - preferred hosted setup: `FIREBASE_SERVICE_ACCOUNT=<single-line JSON>`
 - local default key path: `GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json`
@@ -28,7 +28,7 @@ Startup checks now validate that:
 - `FIREBASE_SERVICE_ACCOUNT` parses as valid JSON when present
 - `GOOGLE_APPLICATION_CREDENTIALS` resolves to a readable `firebase-service-account.json`
 - the local `uploads/` fallback directory exists and is writable
-- Firebase Admin and Gemini config status are printed to the API console
+- Firebase Admin and Qwen config status are printed to the API console
 
 ## Firestore Rules
 

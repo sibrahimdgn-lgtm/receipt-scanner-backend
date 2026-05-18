@@ -12,7 +12,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'Beleg Scanner';
 
   @override
-  String get poweredByGemini => 'Mit Gemini AI';
+  String get poweredByGemini => 'Mit Qwen Vision AI';
 
   @override
   String get navScan => 'Scan';

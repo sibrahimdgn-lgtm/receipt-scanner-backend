@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
   "appTitle": "Receipt Scanner",
-  "poweredByGemini": "Powered by Gemini AI",
+  "poweredByGemini": "Powered by Qwen Vision AI",
   "navScan": "Scan",
   "navDashboard": "Dashboard",
   "navHistory": "History",

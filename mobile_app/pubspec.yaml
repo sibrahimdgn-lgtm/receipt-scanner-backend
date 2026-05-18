@@ -1,5 +1,5 @@
 name: receipt_scanner_app
-description: Multi-tenant receipt scanning mobile app powered by Gemini AI.
+description: Multi-tenant receipt scanning mobile app powered by Qwen Vision AI.
 publish_to: 'none'
 version: 1.0.0+1
 

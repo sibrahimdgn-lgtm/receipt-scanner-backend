@@ -5,7 +5,7 @@ Base URL: `http://127.0.0.1:3000/api`
 ## Health
 
 - `GET /health`
-  - returns server status, timestamp, Firebase Admin status, Storage bucket name, Gemini config status, and local uploads fallback readiness
+  - returns server status, timestamp, Firebase Admin status, Storage bucket name, Qwen config status, and local uploads fallback readiness
 
 ## Auth
 

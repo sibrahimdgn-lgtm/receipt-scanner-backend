@@ -6,7 +6,7 @@ Multi-tenant receipt scanning platform with:
 - Firestore for tenant/shop/receipt data
 - Firebase Cloud Storage for uploaded receipt files
 - Flutter web/mobile client
-- Gemini-powered receipt extraction
+- Qwen Vision-powered receipt extraction
 
 ## Current Scope
 
@@ -30,7 +30,7 @@ It extracts:
 
 - `server.js`: API entry point
 - `src/routes/`: auth, receipt, and dashboard endpoints
-- `src/services/`: Firebase-backed persistence, Gemini, Storage, and dashboard aggregation logic
+- `src/services/`: Firebase-backed persistence, Qwen Vision, Storage, and dashboard aggregation logic
 - `src/config/`: Firebase admin, languages, categories, currency, and file-type config
 - `mobile_app/`: Flutter application
 - `firestore.rules`: Firestore development/test-mode rules
@@ -42,7 +42,7 @@ It extracts:
 ## Backend Environment
 
 Create `.env` from `.env.example` and set:
-- `GEMINI_API_KEY`
+- `QWEN_API_KEY`
 - `FIREBASE_STORAGE_BUCKET`
 - `FIREBASE_SERVICE_ACCOUNT` with the full JSON service account payload for hosted environments like Render
 - one Firebase Admin credential strategy:
@@ -56,7 +56,7 @@ At startup the API now validates:
 - `FIREBASE_SERVICE_ACCOUNT` JSON is parseable when present
 - `firebase-service-account.json` can be resolved from `GOOGLE_APPLICATION_CREDENTIALS` when using a local file
 - the local `uploads/` directory exists and is writable
-- Firebase Admin and Gemini config status are printed to the server console
+- Firebase Admin and Qwen config status are printed to the server console
 
 ## Flutter Firebase Configuration
 

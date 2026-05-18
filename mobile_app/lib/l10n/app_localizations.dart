@@ -111,7 +111,7 @@ abstract class AppLocalizations {
   /// No description provided for @poweredByGemini.
   ///
   /// In en, this message translates to:
-  /// **'Powered by Gemini AI'**
+  /// **'Powered by Qwen Vision AI'**
   String get poweredByGemini;
 
   /// No description provided for @navScan.

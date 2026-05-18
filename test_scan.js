@@ -128,7 +128,7 @@ function scanReceipt(authData) {
     },
   };
 
-  console.log(`\n📤 Gönderiliyor: ${filename} (${(fileData.length / 1024).toFixed(1)} KB) -> Gemini API...`);
+  console.log(`\n📤 Gönderiliyor: ${filename} (${(fileData.length / 1024).toFixed(1)} KB) -> Qwen Vision API...`);
 
   const req = http.request(opts, (res) => {
     let d = '';

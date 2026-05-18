@@ -12,7 +12,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appTitle => 'ماسح الإيصالات';
 
   @override
-  String get poweredByGemini => 'مدعوم بواسطة Gemini AI';
+  String get poweredByGemini => 'مدعوم بواسطة Qwen Vision AI';
 
   @override
   String get navScan => 'مسح';

@@ -39,7 +39,7 @@ test('returns localized upload errors for supported backend languages', () => {
   );
 });
 
-test('builds a Gemini prompt that explicitly accepts PDF receipts', () => {
+test('builds a Qwen prompt that explicitly accepts PDF receipts', () => {
   const prompt = buildReceiptPrompt('en');
 
   assert.match(prompt, /PDF file/i);

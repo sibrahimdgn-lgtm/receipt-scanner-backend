@@ -1,7 +1,7 @@
 {
   "@@locale": "de",
   "appTitle": "Beleg Scanner",
-  "poweredByGemini": "Mit Gemini AI",
+  "poweredByGemini": "Mit Qwen Vision AI",
   "navScan": "Scan",
   "navDashboard": "Dashboard",
   "navHistory": "Verlauf",

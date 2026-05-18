@@ -1,7 +1,7 @@
 /**
  * Receipt Scanner API — Entry Point
  *
- * Multi-tenant receipt scanning server powered by Google Gemini AI.
+ * Multi-tenant receipt scanning server powered by Alibaba Qwen Vision AI.
  * Accepts image/PDF uploads, stores files in Firebase Cloud Storage,
  * and persists tenant data in Firestore.
  */
@@ -19,7 +19,7 @@ const {
   getFirebaseAdminDiagnostics,
   hasFirebaseAdminConfig,
 } = require('./src/config/firebaseAdmin');
-const { hasGeminiApiKey } = require('./src/services/geminiService');
+const { hasQwenApiKey } = require('./src/services/geminiService');
 const { ensureUploadsDir, UPLOADS_ROOT } = require('./src/config/runtimePaths');
 
 const app = express();
@@ -43,7 +43,7 @@ app.get('/api/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     firebaseAdminConfigured: hasFirebaseAdminConfig(),
     firebaseStorageBucket: getFirebaseAdminDiagnostics().storageBucket,
-    geminiConfigured: hasGeminiApiKey(),
+    qwenConfigured: hasQwenApiKey(),
     uploadsFallbackReady: true,
   });
 });
@@ -79,6 +79,8 @@ app.use((err, req, res, _next) => {
 
 // ── Start server ──────────────────────────────────────────────
 app.listen(PORT, () => {
+  const firebaseDiagnostics = getFirebaseAdminDiagnostics();
+
   console.log(`\n🧾 Receipt Scanner API listening on http://localhost:${PORT}`);
   console.log(`   Firebase Admin configured: ${hasFirebaseAdminConfig() ? 'yes' : 'no'}`);
   console.log(`   Firebase credential source: ${firebaseDiagnostics.credentialSource}`);
@@ -87,7 +89,7 @@ app.listen(PORT, () => {
     }`
   );
   console.log(`   Firebase storage bucket: ${firebaseDiagnostics.storageBucket || '(not set)'}`);
-  console.log(`   Gemini API configured: ${hasGeminiApiKey() ? 'yes' : 'no'}`);
+  console.log(`   Qwen API configured: ${hasQwenApiKey() ? 'yes' : 'no'}`);
   console.log(`   Local uploads fallback: ${UPLOADS_ROOT}`);
   console.log(`   POST /api/auth/register     — bootstrap Firestore account`);
   console.log(`   POST /api/auth/login        — verify Firebase session`);

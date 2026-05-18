@@ -1791,3 +1791,31 @@ Yeni oturumda once bu dosya okunacak, sonra bir sonraki `Durum: bekliyor` veya `
   - `flutter build web --release`
   - `firebase deploy --only hosting`
   - Hosting cikti adresi `https://reecaiptscanner.web.app` olsa da dogrulanan calisan domain `https://reecaiptscanner.firebaseapp.com` olmaya devam ediyor.
+
+## 2026-05-18 - Qwen Vision Migration
+
+- Problem:
+  - Kullanici maliyet optimizasyonu icin fiş analiz motorunun Gemini'den Alibaba Qwen Vision `qwen-vl-plus` modeline alinmasini istedi.
+  - Mevcut prompt/JSON kontratinin UI ve Firebase tarafini bozmadan korunmasi gerekiyordu.
+- Duzeltme:
+  - `src/services/geminiService.js` icindeki Google Gemini SDK cagrisi tamamen kaldirildi.
+  - Servis artik DashScope multimodal endpoint'ine dogrudan HTTP `POST` ile gidiyor.
+  - Model sabit olarak `qwen-vl-plus` ayarlandi.
+  - Receipt dosyasi `data:<mime>;base64,...` seklinde `[ { image: ... }, { text: ... } ]` formatinda gonderiliyor.
+  - Eski prompt ayni anahtarlar ve alan kurallari korunacak sekilde muhafaza edildi.
+  - Gemini `responseSchema` guvencesinin yerine, ayni schema JSON olarak sistem talimatina da enjekte edildi.
+  - Yeni env anahtari `QWEN_API_KEY` oldu; `@google/genai` bagimliligi kaldırıldı.
+  - Backend health/log ciktilari `qwenConfigured` ve `Qwen API configured` seklinde guncellendi.
+  - README, deployment notlari, API reference, file index ve `.env.example` Qwen'e gore yenilendi.
+  - Flutter tarafinda gorunen `Powered by Gemini AI` metinleri `Powered by Qwen Vision AI` seklinde guncellendi.
+- Dogrulama:
+  - `node -c server.js`
+  - `node -c src/services/geminiService.js`
+  - `node --test test/*.test.js`
+  - `flutter gen-l10n`
+  - `flutter test`
+  - `flutter build web --release`
+  - `firebase deploy --only hosting`
+  - `curl http://127.0.0.1:3000/api/health`
+    - sonuc: `qwenConfigured:false` cunku bu local ortamda henuz `QWEN_API_KEY` tanimli degil
+  - Hosting deploy basarili; dogrulanan calisan domain yine `https://reecaiptscanner.firebaseapp.com`

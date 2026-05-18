@@ -1,7 +1,7 @@
 {
   "@@locale": "tr",
   "appTitle": "Fiş Tarayıcı",
-  "poweredByGemini": "Gemini AI destekli",
+  "poweredByGemini": "Qwen Vision AI destekli",
   "navScan": "Tarama",
   "navDashboard": "Panel",
   "navHistory": "Geçmiş",

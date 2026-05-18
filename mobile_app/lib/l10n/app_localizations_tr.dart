@@ -12,7 +12,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appTitle => 'Fiş Tarayıcı';
 
   @override
-  String get poweredByGemini => 'Gemini AI destekli';
+  String get poweredByGemini => 'Qwen Vision AI destekli';
 
   @override
   String get navScan => 'Tarama';

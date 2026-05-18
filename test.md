@@ -10,24 +10,24 @@ Verify behavior with the smallest meaningful proof first, then widen only when t
 2. Focused unit or widget tests
 3. Local API smoke checks
 4. Web build
-5. Real Gemini scan only when explicitly needed
+5. Real Qwen scan only when explicitly needed
 
-## Gemini Cost Rule
+## Qwen Cost Rule
 
-Real Gemini calls are not part of the default verification lane.
+Real Qwen calls are not part of the default verification lane.
 
 Prefer:
 - unit tests for prompt/schema generation
-- upload filter smoke tests that fail before Gemini
-- import-based smoke tests that do not invoke Gemini
+- upload filter smoke tests that fail before Qwen
+- import-based smoke tests that do not invoke Qwen
 - health, auth, and history/summary checks
 
-Use a real Gemini receipt scan only when:
+Use a real Qwen receipt scan only when:
 - the user asks for a real end-to-end proof
 - the bug only reproduces on the live model path
 - lower-cost verification cannot prove the changed behavior
 
-If a real Gemini call is made:
+If a real Qwen call is made:
 - keep it to the minimum number of requests
 - use one representative file
 - record that choice in `LOCAL_RUN_PLAN.md`

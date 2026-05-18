@@ -15,7 +15,7 @@
 - `src/services/firestoreDataService.js`: Firestore CRUD for shops, users, receipts
 - `src/services/firestoreDashboardService.js`: dashboard/history aggregation from Firestore receipt documents
 - `src/services/storageService.js`: Firebase Cloud Storage upload/delete helpers
-- `src/services/geminiService.js`: prompt/schema generation and Gemini calls from buffer or URL
+- `src/services/geminiService.js`: prompt/schema generation and Qwen Vision calls from buffer or URL
 - `src/services/dashboardTrendService.js`: dashboard period config and drilldown shaping
 - `firestore.rules`: Firestore test-mode development rules
 - `firebase.json`: Firebase CLI mapping for Firestore rules

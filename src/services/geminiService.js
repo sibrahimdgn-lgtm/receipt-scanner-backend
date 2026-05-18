@@ -1,9 +1,8 @@
 /**
- * Gemini AI Service
- * Sends receipt images or PDFs to Google Gemini for structured data extraction.
+ * Qwen Vision Service
+ * Sends receipt images or PDFs to Alibaba Qwen for structured data extraction.
  */
 
-const { GoogleGenAI } = require('@google/genai');
 const {
   DEFAULT_RECEIPT_CATEGORY_KEY,
   getReceiptCategoryLabel,
@@ -16,21 +15,16 @@ const {
 } = require('../config/languages');
 const { normalizeReceiptMimeType } = require('../config/receiptFiles');
 
-function getGeminiApiKey() {
-  return process.env.GEMINI_API_KEY?.trim() || null;
+const QWEN_RECEIPT_ENDPOINT =
+  'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
+const QWEN_RECEIPT_MODEL = 'qwen-vl-plus';
+
+function getQwenApiKey() {
+  return process.env.QWEN_API_KEY?.trim() || null;
 }
 
-function hasGeminiApiKey() {
-  return Boolean(getGeminiApiKey());
-}
-
-function getGeminiClient() {
-  const apiKey = getGeminiApiKey();
-  if (!apiKey) {
-    throw new Error('Gemini API is not configured. Set GEMINI_API_KEY.');
-  }
-
-  return new GoogleGenAI({ apiKey });
+function hasQwenApiKey() {
+  return Boolean(getQwenApiKey());
 }
 
 function buildReceiptSchema(language = DEFAULT_LANGUAGE) {
@@ -134,7 +128,7 @@ function buildReceiptPrompt(language = DEFAULT_LANGUAGE) {
     'Do not default to USD unless the receipt explicitly supports USD.',
     'tax_amount must contain the total VAT/KDV/tax amount if present; otherwise use 0.',
     'line_items must include every detected purchased item with item_name, transaction_date, quantity, unit_price, total_price, and category.',
-    'If the document is a bank statement or any multi-date list, find each row\'s own date and write it into transaction_date.',
+    "If the document is a bank statement or any multi-date list, find each row's own date and write it into transaction_date.",
     'If a row does not have its own date, use the main receipt_date or null for transaction_date.',
     'Return a single JSON object.',
   ].join(' ');
@@ -145,6 +139,11 @@ async function analyzeReceipt(
   mimeType,
   { language = DEFAULT_LANGUAGE, storageUrl = null } = {}
 ) {
+  const apiKey = getQwenApiKey();
+  if (!apiKey) {
+    throw new Error('Qwen API is not configured. Set QWEN_API_KEY.');
+  }
+
   const languageCode = normalizeLanguageCode(language);
   const normalizedMimeType = normalizeReceiptMimeType(
     mimeType,
@@ -154,43 +153,140 @@ async function analyzeReceipt(
     throw new Error('Unsupported receipt file type for AI analysis.');
   }
 
-  const binary = await resolveReceiptBinary(fileInput, storageUrl);
-  const base64File = binary.toString('base64');
+  const mediaPayload = await buildReceiptMediaPayload(
+    fileInput,
+    normalizedMimeType,
+    storageUrl
+  );
+  const prompt = buildReceiptPrompt(languageCode);
+  const schemaGuide = JSON.stringify(buildReceiptSchema(languageCode));
 
   let response;
   try {
-    response = await getGeminiClient().models.generateContent({
-      model: 'models/gemini-2.5-flash',
-      contents: [
-        {
-          inlineData: {
-            mimeType: normalizedMimeType,
-            data: base64File,
+    response = await fetch(QWEN_RECEIPT_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: QWEN_RECEIPT_MODEL,
+        input: {
+          messages: [
+            {
+              role: 'system',
+              content: [
+                {
+                  text: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
+                },
+              ],
+            },
+            {
+              role: 'user',
+              content: [
+                mediaPayload,
+                {
+                  text: 'Return the receipt analysis as a single JSON object matching the required keys exactly.',
+                },
+              ],
+            },
+          ],
+        },
+        parameters: {
+          result_format: 'message',
+          response_format: {
+            type: 'json_object',
           },
         },
-        { text: buildReceiptPrompt(languageCode) },
-      ],
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: buildReceiptSchema(languageCode),
-      },
+      }),
     });
   } catch (error) {
     error.message =
-      `Gemini receipt analysis failed for ${normalizedMimeType} (${languageCode}): ${error.message}`;
+      `Qwen receipt analysis request failed for ${normalizedMimeType} (${languageCode}): ${error.message}`;
     throw error;
   }
 
-  return JSON.parse(response.text);
+  const payload = await response.json().catch(async () => ({
+    message: await response.text(),
+  }));
+
+  if (!response.ok) {
+    throw new Error(
+      `Qwen receipt analysis failed for ${normalizedMimeType} (${languageCode}): ${formatQwenError(
+        payload
+      )}`
+    );
+  }
+
+  const responseText = extractQwenText(payload);
+  if (!responseText) {
+    throw new Error(
+      `Qwen receipt analysis returned an empty response for ${normalizedMimeType} (${languageCode}).`
+    );
+  }
+
+  try {
+    return JSON.parse(stripJsonCodeFences(responseText));
+  } catch (error) {
+    error.message =
+      `Qwen receipt analysis returned invalid JSON for ${normalizedMimeType} (${languageCode}): ${error.message}`;
+    throw error;
+  }
 }
 
 module.exports = {
   analyzeReceipt,
   buildReceiptPrompt,
   buildReceiptSchema,
-  getGeminiApiKey,
-  hasGeminiApiKey,
+  getQwenApiKey,
+  hasQwenApiKey,
 };
+
+async function buildReceiptMediaPayload(fileInput, mimeType, storageUrl = null) {
+  if (storageUrl) {
+    return { image: storageUrl };
+  }
+
+  const binary = await resolveReceiptBinary(fileInput, storageUrl);
+  const base64File = binary.toString('base64');
+  return { image: `data:${mimeType};base64,${base64File}` };
+}
+
+function extractQwenText(payload) {
+  const contentBlocks = payload?.output?.choices?.[0]?.message?.content;
+  if (!Array.isArray(contentBlocks)) {
+    return null;
+  }
+
+  const textBlock = contentBlocks.find(
+    (block) => typeof block?.text === 'string' && block.text.trim()
+  );
+  return textBlock?.text?.trim() || null;
+}
+
+function formatQwenError(payload) {
+  if (typeof payload?.message === 'string' && payload.message.trim()) {
+    return payload.message.trim();
+  }
+
+  if (typeof payload?.code === 'string' && payload.code.trim()) {
+    return payload.code.trim();
+  }
+
+  if (typeof payload?.output?.message === 'string' && payload.output.message.trim()) {
+    return payload.output.message.trim();
+  }
+
+  return 'Unknown Qwen API error.';
+}
+
+function stripJsonCodeFences(text) {
+  return text
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+}
 
 async function resolveReceiptBinary(fileInput, storageUrl = null) {
   if (Buffer.isBuffer(fileInput)) {

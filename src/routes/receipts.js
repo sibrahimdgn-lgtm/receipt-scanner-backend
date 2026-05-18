@@ -83,7 +83,7 @@ router.post(
       };
 
       console.log(
-        `[Receipt] Gemini extracted: ${receiptData.vendor_name}, ` +
+        `[Receipt] Qwen extracted: ${receiptData.vendor_name}, ` +
           `${receiptData.line_items?.length || 0} item(s), total: ${receiptData.total_amount}, ` +
           `currency: ${resolvedCurrency.currency_code} (${resolvedCurrency.currency_source}), ` +
           `lang: ${requestContext.language}`
