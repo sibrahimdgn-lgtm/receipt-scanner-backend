@@ -174,26 +174,17 @@ async function analyzeReceipt(
         input: {
           messages: [
             {
-              role: 'system',
-              content: [
-                {
-                  text: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
-                },
-              ],
-            },
-            {
               role: 'user',
               content: [
                 mediaPayload,
                 {
-                  text: 'Return the receipt analysis as a single JSON object matching the required keys exactly.',
+                  text: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
                 },
               ],
             },
           ],
         },
         parameters: {
-          result_format: 'message',
           response_format: {
             type: 'json_object',
           },
