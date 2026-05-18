@@ -1770,3 +1770,24 @@ Yeni oturumda once bu dosya okunacak, sonra bir sonraki `Durum: bekliyor` veya `
   - `rules.md` icindeki branch secimi ve task-branch zorunlulugu kaldirildi.
   - Workflow artik `main`-only olacak sekilde `Mainline Rule` ile guncellendi.
   - `SHIP`, `Git And Commit Rule` ve `Done Gate` satirlari branch referansi icermeyecek sekilde sadeleştirildi.
+
+## 2026-05-18 - Hybrid PDF + Excel Export
+
+- Problem:
+  - Kullanici `Gecmis` ekranindaki mevcut CSV export alanini PDF odakli, ama Excel/CSV alternatifi de sunan hibrit bir export deneyimine donusturmek istedi.
+  - Firebase veri cekme mantigina dokunmadan, Flutter Web uzerinden hem PDF hem CSV indirme gerekiyor.
+- Duzeltme:
+  - `HistoryScreen` icindeki export aksiyonu app bar'dan alinip sayfa ici export toolbar'ina tasindi.
+  - Birincil aksiyon olarak teal renkli `PDF Raporu Al` butonu eklendi.
+  - Ikincil aksiyon olarak outlined `Excel (.csv) Olarak Indir` butonu eklendi.
+  - `mobile_app/lib/utils/history_pdf_export.dart` ile beyaz zeminli, baslikli ve toplam harcama ozeti olan minimalist PDF tablo uretiliyor.
+  - `mobile_app/lib/services/pdf_download_service*.dart` ile uretilen PDF Flutter Web'de tarayiciya indiriliyor.
+  - Mevcut CSV export akisi korundu; sadece buton metni ve basari/hata geri bildirimi Excel/CSV diline cekildi.
+  - Tum yeni metinler `en/tr/de/ar` l10n kaynaklarina eklendi.
+- Dogrulama:
+  - `flutter gen-l10n`
+  - `flutter test test/history_pdf_export_test.dart test/history_csv_export_test.dart`
+  - `flutter test`
+  - `flutter build web --release`
+  - `firebase deploy --only hosting`
+  - Hosting cikti adresi `https://reecaiptscanner.web.app` olsa da dogrulanan calisan domain `https://reecaiptscanner.firebaseapp.com` olmaya devam ediyor.

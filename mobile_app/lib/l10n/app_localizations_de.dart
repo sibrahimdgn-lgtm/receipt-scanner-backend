@@ -70,6 +70,40 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Belegbericht konnte nicht heruntergeladen werden.';
 
   @override
+  String get exportPdfReport => 'PDF-Bericht abrufen';
+
+  @override
+  String get exportExcelCsv => 'Als Excel (.csv) herunterladen';
+
+  @override
+  String get pdfReportDownloaded =>
+      'Der PDF-Bericht wurde erfolgreich heruntergeladen.';
+
+  @override
+  String get pdfReportFailed =>
+      'Der PDF-Bericht konnte nicht heruntergeladen werden.';
+
+  @override
+  String get excelReportDownloaded =>
+      'Der Excel-Bericht wurde erfolgreich heruntergeladen.';
+
+  @override
+  String get excelReportFailed =>
+      'Der Excel-Bericht konnte nicht heruntergeladen werden.';
+
+  @override
+  String get historyPdfReportTitle => 'Belegverlaufsbericht';
+
+  @override
+  String get reportGeneratedOn => 'Erstellt am';
+
+  @override
+  String get reportTotalSpend => 'GESAMTAUSGABEN';
+
+  @override
+  String get reportMixedCurrencies => 'Gemischte Waehrungen';
+
+  @override
   String get scanReceiptTitle => 'Beleg scannen';
 
   @override

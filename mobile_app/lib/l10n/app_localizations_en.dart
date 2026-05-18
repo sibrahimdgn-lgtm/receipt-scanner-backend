@@ -69,6 +69,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receiptExportFailed => 'Receipt report could not be downloaded.';
 
   @override
+  String get exportPdfReport => 'Get PDF Report';
+
+  @override
+  String get exportExcelCsv => 'Download as Excel (.csv)';
+
+  @override
+  String get pdfReportDownloaded => 'PDF report downloaded successfully.';
+
+  @override
+  String get pdfReportFailed => 'PDF report could not be downloaded.';
+
+  @override
+  String get excelReportDownloaded => 'Excel report downloaded successfully.';
+
+  @override
+  String get excelReportFailed => 'Excel report could not be downloaded.';
+
+  @override
+  String get historyPdfReportTitle => 'Receipt History Report';
+
+  @override
+  String get reportGeneratedOn => 'Generated on';
+
+  @override
+  String get reportTotalSpend => 'TOTAL SPEND';
+
+  @override
+  String get reportMixedCurrencies => 'Mixed currencies';
+
+  @override
   String get scanReceiptTitle => 'Scan a Receipt';
 
   @override

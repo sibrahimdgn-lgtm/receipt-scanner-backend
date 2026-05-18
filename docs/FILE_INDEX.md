@@ -37,11 +37,15 @@
 - `mobile_app/lib/services/csv_download_service.dart`: conditional CSV download entry point for Flutter Web export
 - `mobile_app/lib/services/csv_download_service_web.dart`: browser download implementation using a hidden anchor element
 - `mobile_app/lib/services/csv_download_service_stub.dart`: non-web fallback for CSV export
+- `mobile_app/lib/services/pdf_download_service.dart`: conditional PDF download entry point for Flutter Web export
+- `mobile_app/lib/services/pdf_download_service_web.dart`: browser PDF download implementation using a hidden anchor element
+- `mobile_app/lib/services/pdf_download_service_stub.dart`: non-web fallback for PDF export
 - `mobile_app/lib/services/receipt_api_service.dart`: camera, file picking, upload preparation
 - `mobile_app/lib/services/dashboard_service.dart`: backend dashboard/history/edit/delete calls
 - `mobile_app/lib/utils/auth_error_message.dart`: localized auth error mapping
 - `mobile_app/lib/utils/dashboard_trend.dart`: typed dashboard trend buckets and drilldown parsing
 - `mobile_app/lib/utils/history_csv_export.dart`: CSV row construction for history export
+- `mobile_app/lib/utils/history_pdf_export.dart`: PDF report construction for history export
 - `mobile_app/lib/utils/receipt_date_format.dart`: localized formatting for receipt and line-item dates
 - `mobile_app/lib/widgets/animated_backdrop.dart`: shared animated gradient/orb backdrop
 - `mobile_app/lib/widgets/dashboard_trend_chart.dart`: expandable trend bar chart with weekly drilldown animation

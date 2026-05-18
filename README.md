@@ -24,7 +24,7 @@ It extracts:
 - line items
 - localized categories
 - currency metadata
-- downloadable CSV history exports from the History screen
+- downloadable PDF and CSV history exports from the History screen
 
 ## Project Layout
 

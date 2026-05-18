@@ -5,8 +5,10 @@ import '../l10n/l10n.dart';
 import '../services/auth_service.dart';
 import '../services/csv_download_service.dart';
 import '../services/dashboard_service.dart';
+import '../services/pdf_download_service.dart';
 import '../utils/currency_format.dart';
 import '../utils/history_csv_export.dart';
+import '../utils/history_pdf_export.dart';
 import '../utils/receipt_date_format.dart';
 import '../widgets/animated_backdrop.dart';
 import '../widgets/hover_lift_card.dart';
@@ -74,7 +76,61 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _exportReceipts() async {
+  Future<void> _exportReceiptsAsPdf() async {
+    if (_receipts.isEmpty) {
+      return;
+    }
+
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+
+    try {
+      final pdfBytes = await buildHistoryPdfBytes(
+        _receipts,
+        labels: HistoryPdfLabels(
+          title: l10n.historyPdfReportTitle,
+          generatedOn: l10n.reportGeneratedOn,
+          date: l10n.date,
+          vendorName: l10n.vendorName,
+          category: l10n.category,
+          totalAmount: l10n.total,
+          currency: l10n.currencyCode,
+          totalSpend: l10n.reportTotalSpend,
+          mixedCurrencies: l10n.reportMixedCurrencies,
+        ),
+        categoryLabelFor: (value) => ReceiptCategories.labelFor(context, value),
+        locale: Localizations.localeOf(context),
+      );
+
+      final dateLabel = DateTime.now().toIso8601String().split('T').first;
+      await downloadPdfFile(
+        filename: 'receipt-report-$dateLabel.pdf',
+        pdfBytes: pdfBytes,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      _showStatusSnackBar(
+        message: l10n.pdfReportDownloaded,
+        icon: Icons.picture_as_pdf_rounded,
+        accentColor: theme.colorScheme.primary,
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      _showStatusSnackBar(
+        message: l10n.pdfReportFailed,
+        icon: Icons.error_outline_rounded,
+        accentColor: theme.colorScheme.error,
+      );
+    }
+  }
+
+  Future<void> _exportReceiptsAsCsv() async {
     if (_receipts.isEmpty) {
       return;
     }
@@ -109,8 +165,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
 
       _showStatusSnackBar(
-        message: l10n.receiptExportDownloaded,
-        icon: Icons.download_done_rounded,
+        message: l10n.excelReportDownloaded,
+        icon: Icons.table_chart_rounded,
         accentColor: theme.colorScheme.primary,
       );
     } catch (_) {
@@ -119,7 +175,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
 
       _showStatusSnackBar(
-        message: l10n.receiptExportFailed,
+        message: l10n.excelReportFailed,
         icon: Icons.error_outline_rounded,
         accentColor: theme.colorScheme.error,
       );
@@ -180,57 +236,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
                 ),
-                actions: [
-                  if (AuthService.instance.isLoggedIn &&
-                      !_loading &&
-                      _error == null &&
-                      _receipts.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Center(
-                        child: isCompact
-                            ? IconButton(
-                                tooltip: l10n.exportCsv,
-                                onPressed: _exportReceipts,
-                                style: IconButton.styleFrom(
-                                  backgroundColor: theme.colorScheme.surface,
-                                  foregroundColor: theme.colorScheme.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    side: BorderSide(
-                                      color: theme.colorScheme.primary
-                                          .withValues(alpha: 0.28),
-                                    ),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.download_rounded),
-                              )
-                            : OutlinedButton.icon(
-                                onPressed: _exportReceipts,
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: theme.colorScheme.primary,
-                                  backgroundColor: theme.colorScheme.surface,
-                                  side: BorderSide(
-                                    color: theme.colorScheme.primary
-                                        .withValues(alpha: 0.28),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.download_rounded,
-                                  size: 18,
-                                ),
-                                label: Text(l10n.exportCsv),
-                              ),
-                      ),
-                    ),
-                  const LanguageSwitcherButton(
+                actions: const [
+                  LanguageSwitcherButton(
                     margin: EdgeInsets.only(right: 12),
                   ),
                 ],
@@ -295,31 +302,101 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 )
               else
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    isCompact ? 12 : 16,
-                    8,
-                    isCompact ? 12 : 16,
-                    24,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (ctx, index) => MotionReveal(
-                        delay: Duration(milliseconds: 60 * index.clamp(0, 8)),
-                        child: _ReceiptCard(
-                          receipt: _receipts[index],
-                          onChanged: _load,
-                          isCompact: isCompact,
+                SliverMainAxisGroup(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          isCompact ? 12 : 16,
+                          12,
+                          isCompact ? 12 : 16,
+                          16,
+                        ),
+                        child: _buildExportActions(theme, l10n, isCompact),
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        isCompact ? 12 : 16,
+                        0,
+                        isCompact ? 12 : 16,
+                        24,
+                      ),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (ctx, index) => MotionReveal(
+                            delay:
+                                Duration(milliseconds: 60 * index.clamp(0, 8)),
+                            child: _ReceiptCard(
+                              receipt: _receipts[index],
+                              onChanged: _load,
+                              isCompact: isCompact,
+                            ),
+                          ),
+                          childCount: _receipts.length,
                         ),
                       ),
-                      childCount: _receipts.length,
                     ),
-                  ),
+                  ],
                 ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildExportActions(ThemeData theme, dynamic l10n, bool isCompact) {
+    final pdfButton = FilledButton.icon(
+      onPressed: _exportReceiptsAsPdf,
+      icon: const Icon(Icons.picture_as_pdf_rounded, size: 18),
+      label: Text(l10n.exportPdfReport),
+      style: FilledButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+
+    final excelButton = OutlinedButton.icon(
+      onPressed: _exportReceiptsAsCsv,
+      icon: const Icon(Icons.table_chart_rounded, size: 18),
+      label: Text(l10n.exportExcelCsv),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: theme.colorScheme.primary,
+        backgroundColor: theme.colorScheme.surface,
+        side: BorderSide(
+          color: theme.colorScheme.primary.withValues(alpha: 0.28),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          pdfButton,
+          const SizedBox(height: 12),
+          excelButton,
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      alignment: WrapAlignment.end,
+      children: [
+        pdfButton,
+        excelButton,
+      ],
     );
   }
 }

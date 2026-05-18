@@ -68,6 +68,36 @@ class AppLocalizationsTr extends AppLocalizations {
   String get receiptExportFailed => 'Fiş dökümü indirilemedi.';
 
   @override
+  String get exportPdfReport => 'PDF Raporu Al';
+
+  @override
+  String get exportExcelCsv => 'Excel (.csv) Olarak İndir';
+
+  @override
+  String get pdfReportDownloaded => 'PDF Raporu başarıyla indirildi.';
+
+  @override
+  String get pdfReportFailed => 'PDF Raporu indirilemedi.';
+
+  @override
+  String get excelReportDownloaded => 'Excel dökümü başarıyla indirildi.';
+
+  @override
+  String get excelReportFailed => 'Excel dökümü indirilemedi.';
+
+  @override
+  String get historyPdfReportTitle => 'Fiş Geçmişi Raporu';
+
+  @override
+  String get reportGeneratedOn => 'Oluşturulma zamanı';
+
+  @override
+  String get reportTotalSpend => 'TOPLAM HARCAMA';
+
+  @override
+  String get reportMixedCurrencies => 'Karma para birimleri';
+
+  @override
   String get scanReceiptTitle => 'Fiş Tara';
 
   @override

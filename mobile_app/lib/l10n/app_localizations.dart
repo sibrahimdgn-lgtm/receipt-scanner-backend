@@ -216,6 +216,66 @@ abstract class AppLocalizations {
   /// **'Receipt report could not be downloaded.'**
   String get receiptExportFailed;
 
+  /// No description provided for @exportPdfReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Get PDF Report'**
+  String get exportPdfReport;
+
+  /// No description provided for @exportExcelCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Download as Excel (.csv)'**
+  String get exportExcelCsv;
+
+  /// No description provided for @pdfReportDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF report downloaded successfully.'**
+  String get pdfReportDownloaded;
+
+  /// No description provided for @pdfReportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF report could not be downloaded.'**
+  String get pdfReportFailed;
+
+  /// No description provided for @excelReportDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel report downloaded successfully.'**
+  String get excelReportDownloaded;
+
+  /// No description provided for @excelReportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel report could not be downloaded.'**
+  String get excelReportFailed;
+
+  /// No description provided for @historyPdfReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt History Report'**
+  String get historyPdfReportTitle;
+
+  /// No description provided for @reportGeneratedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated on'**
+  String get reportGeneratedOn;
+
+  /// No description provided for @reportTotalSpend.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL SPEND'**
+  String get reportTotalSpend;
+
+  /// No description provided for @reportMixedCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed currencies'**
+  String get reportMixedCurrencies;
+
   /// No description provided for @scanReceiptTitle.
   ///
   /// In en, this message translates to:

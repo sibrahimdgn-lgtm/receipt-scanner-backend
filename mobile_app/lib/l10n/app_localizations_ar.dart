@@ -68,6 +68,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get receiptExportFailed => 'تعذر تنزيل تقرير الإيصالات.';
 
   @override
+  String get exportPdfReport => 'تنزيل تقرير PDF';
+
+  @override
+  String get exportExcelCsv => 'تنزيل بصيغة Excel (.csv)';
+
+  @override
+  String get pdfReportDownloaded => 'تم تنزيل تقرير PDF بنجاح.';
+
+  @override
+  String get pdfReportFailed => 'تعذر تنزيل تقرير PDF.';
+
+  @override
+  String get excelReportDownloaded => 'تم تنزيل تقرير Excel بنجاح.';
+
+  @override
+  String get excelReportFailed => 'تعذر تنزيل تقرير Excel.';
+
+  @override
+  String get historyPdfReportTitle => 'تقرير سجل الإيصالات';
+
+  @override
+  String get reportGeneratedOn => 'تاريخ الإنشاء';
+
+  @override
+  String get reportTotalSpend => 'إجمالي الإنفاق';
+
+  @override
+  String get reportMixedCurrencies => 'عملات متعددة';
+
+  @override
   String get scanReceiptTitle => 'امسح إيصالًا';
 
   @override
