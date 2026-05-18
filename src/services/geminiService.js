@@ -16,7 +16,7 @@ const {
 const { normalizeReceiptMimeType } = require('../config/receiptFiles');
 
 const QWEN_RECEIPT_ENDPOINT =
-  'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
+  'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
 const QWEN_RECEIPT_MODEL = 'qwen-vl-plus';
 
 function getQwenApiKey() {
@@ -171,23 +171,24 @@ async function analyzeReceipt(
       },
       body: JSON.stringify({
         model: QWEN_RECEIPT_MODEL,
-        input: {
-          messages: [
-            {
-              role: 'user',
-              content: [
-                mediaPayload,
-                {
-                  text: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
-                },
-              ],
-            },
-          ],
-        },
-        parameters: {
-          response_format: {
-            type: 'json_object',
+        messages: [
+          {
+            role: 'system',
+            content: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
           },
+          {
+            role: 'user',
+            content: [
+              mediaPayload,
+              {
+                type: 'text',
+                text: 'Return the receipt analysis as a single JSON object matching the required keys exactly.',
+              },
+            ],
+          },
+        ],
+        response_format: {
+          type: 'json_object',
         },
       }),
     });
@@ -235,16 +236,23 @@ module.exports = {
 
 async function buildReceiptMediaPayload(fileInput, mimeType, storageUrl = null) {
   if (storageUrl) {
-    return { image: storageUrl };
+    return { type: 'image_url', image_url: { url: storageUrl } };
   }
 
   const binary = await resolveReceiptBinary(fileInput, storageUrl);
   const base64File = binary.toString('base64');
-  return { image: `data:${mimeType};base64,${base64File}` };
+  return {
+    type: 'image_url',
+    image_url: { url: `data:${mimeType};base64,${base64File}` },
+  };
 }
 
 function extractQwenText(payload) {
-  const contentBlocks = payload?.output?.choices?.[0]?.message?.content;
+  const contentBlocks = payload?.choices?.[0]?.message?.content;
+  if (typeof contentBlocks === 'string' && contentBlocks.trim()) {
+    return contentBlocks.trim();
+  }
+
   if (!Array.isArray(contentBlocks)) {
     return null;
   }
@@ -258,6 +266,10 @@ function extractQwenText(payload) {
 function formatQwenError(payload) {
   if (typeof payload?.message === 'string' && payload.message.trim()) {
     return payload.message.trim();
+  }
+
+  if (typeof payload?.error?.message === 'string' && payload.error.message.trim()) {
+    return payload.error.message.trim();
   }
 
   if (typeof payload?.code === 'string' && payload.code.trim()) {
