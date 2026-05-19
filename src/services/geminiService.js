@@ -4,6 +4,7 @@
  */
 
 const OpenAI = require('openai');
+const path = require('path');
 const {
   DEFAULT_RECEIPT_CATEGORY_KEY,
   getReceiptCategoryLabel,
@@ -70,6 +71,11 @@ function getQwenMaxRetries() {
       process.env.CREATIVE_QWEN_MAX_RETRIES?.trim() ||
       DEFAULT_QWEN_MAX_RETRIES
   );
+}
+
+function getQwenHttpApiBaseUrl() {
+  const baseUrl = getQwenBaseUrl();
+  return baseUrl.replace(/\/compatible-mode\/v1\/?$/, '/api/v1');
 }
 
 function buildReceiptSchema(language = DEFAULT_LANGUAGE) {
@@ -202,7 +208,11 @@ async function analyzeReceipt(
 
   const prompt = buildReceiptPrompt(languageCode);
   const schemaGuide = JSON.stringify(buildReceiptSchema(languageCode));
-  const imageUrl = await buildReceiptImageUrl(fileInput, normalizedMimeType, storageUrl);
+  const mediaReference = await buildReceiptMediaReference(
+    fileInput,
+    normalizedMimeType,
+    storageUrl
+  );
 
   let completion;
   try {
@@ -223,7 +233,7 @@ async function analyzeReceipt(
             {
               type: 'image_url',
               image_url: {
-                url: imageUrl,
+                url: mediaReference.url,
               },
             },
             {
@@ -236,7 +246,13 @@ async function analyzeReceipt(
       response_format: { type: 'json_object' },
       max_tokens: DEFAULT_QWEN_MAX_OUTPUT_TOKENS,
       extra_body: { enable_thinking: false },
-    });
+    }, mediaReference.requiresOssResolve
+      ? {
+          headers: {
+            'X-DashScope-OssResourceResolve': 'enable',
+          },
+        }
+      : undefined);
   } catch (error) {
     error.message =
       `Qwen receipt analysis request failed for ${normalizedMimeType} (${languageCode}): ${error.message}`;
@@ -293,13 +309,33 @@ function getQwenClient() {
   return cachedClient;
 }
 
-async function buildReceiptImageUrl(fileInput, mimeType, storageUrl = null) {
-  if (storageUrl) {
-    return storageUrl;
+async function buildReceiptMediaReference(fileInput, mimeType, storageUrl = null) {
+  if (storageUrl && mimeType !== 'application/pdf') {
+    return {
+      url: storageUrl,
+      requiresOssResolve: false,
+    };
   }
 
   const binary = await resolveReceiptBinary(fileInput, storageUrl);
-  return `data:${mimeType};base64,${binary.toString('base64')}`;
+  if (mimeType === 'application/pdf') {
+    const tempOssUrl = await uploadReceiptToDashScopeTempStorage(binary, {
+      filename:
+        typeof fileInput === 'object' && fileInput?.filename
+          ? fileInput.filename
+          : 'receipt.pdf',
+      mimeType,
+    });
+    return {
+      url: tempOssUrl,
+      requiresOssResolve: true,
+    };
+  }
+
+  return {
+    url: `data:${mimeType};base64,${binary.toString('base64')}`,
+    requiresOssResolve: false,
+  };
 }
 
 function extractQwenText(completion) {
@@ -356,4 +392,66 @@ async function resolveReceiptBinary(fileInput, storageUrl = null) {
   }
 
   throw new Error('Receipt analysis requires a file buffer or storage URL.');
+}
+
+async function uploadReceiptToDashScopeTempStorage(
+  fileBuffer,
+  { filename = 'receipt.pdf', mimeType = 'application/pdf' } = {}
+) {
+  const apiKey = getQwenApiKey();
+  const model = getQwenVisionModel();
+  const policyResponse = await fetch(
+    `${getQwenHttpApiBaseUrl()}/uploads?action=getPolicy&model=${encodeURIComponent(model)}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    }
+  );
+
+  const policyPayload = await policyResponse.json().catch(async () => ({
+    message: await policyResponse.text(),
+  }));
+
+  if (!policyResponse.ok) {
+    throw new Error(
+      `Unable to get DashScope upload policy: ${policyPayload?.message || policyPayload?.code || policyResponse.status}`
+    );
+  }
+
+  const policyData = policyPayload?.data;
+  if (!policyData?.upload_host || !policyData?.upload_dir || !policyData?.policy) {
+    throw new Error('DashScope upload policy response was incomplete.');
+  }
+
+  const safeFilename = sanitizeFilename(filename);
+  const objectKey = `${policyData.upload_dir}/${safeFilename}`;
+  const form = new FormData();
+  form.set('OSSAccessKeyId', policyData.oss_access_key_id);
+  form.set('Signature', policyData.signature);
+  form.set('policy', policyData.policy);
+  form.set('x-oss-object-acl', policyData.x_oss_object_acl || 'private');
+  form.set('x-oss-forbid-overwrite', 'true');
+  form.set('key', objectKey);
+  form.set('success_action_status', '200');
+  form.set('file', new Blob([fileBuffer], { type: mimeType }), safeFilename);
+
+  const uploadResponse = await fetch(policyData.upload_host, {
+    method: 'POST',
+    body: form,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error(
+      `DashScope temporary upload failed with status ${uploadResponse.status}.`
+    );
+  }
+
+  return `oss://${objectKey}`;
+}
+
+function sanitizeFilename(filename) {
+  const basename = path.basename(filename).replace(/[^\w.-]+/g, '-');
+  return basename || 'receipt.pdf';
 }
