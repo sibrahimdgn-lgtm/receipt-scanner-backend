@@ -72,15 +72,9 @@ app.use((err, req, res, _next) => {
   console.error(`[Error] ${req.method} ${req.originalUrl}`);
   console.error(err);
 
-  const response = {
+  res.status(500).json({
     error: 'Internal server error. Please try again later.',
-  };
-
-  if (req.headers['x-debug-error'] === '1') {
-    response.details = err?.message || String(err);
-  }
-
-  res.status(500).json(response);
+  });
 });
 
 // ── Start server ──────────────────────────────────────────────
