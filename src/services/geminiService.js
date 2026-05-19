@@ -4,7 +4,6 @@
  */
 
 const OpenAI = require('openai');
-const path = require('path');
 const {
   DEFAULT_RECEIPT_CATEGORY_KEY,
   getReceiptCategoryLabel,
@@ -23,6 +22,7 @@ const DEFAULT_QWEN_VL_MODEL = 'qwen3-vl-plus';
 const DEFAULT_QWEN_TIMEOUT_SECONDS = 120;
 const DEFAULT_QWEN_MAX_RETRIES = 2;
 const DEFAULT_QWEN_MAX_OUTPUT_TOKENS = 8192;
+const PDF_RASTER_SCALE = 2;
 
 let cachedClient = null;
 let cachedClientSignature = '';
@@ -71,11 +71,6 @@ function getQwenMaxRetries() {
       process.env.CREATIVE_QWEN_MAX_RETRIES?.trim() ||
       DEFAULT_QWEN_MAX_RETRIES
   );
-}
-
-function getQwenHttpApiBaseUrl() {
-  const baseUrl = getQwenBaseUrl();
-  return baseUrl.replace(/\/compatible-mode\/v1\/?$/, '/api/v1');
 }
 
 function buildReceiptSchema(language = DEFAULT_LANGUAGE) {
@@ -208,7 +203,7 @@ async function analyzeReceipt(
 
   const prompt = buildReceiptPrompt(languageCode);
   const schemaGuide = JSON.stringify(buildReceiptSchema(languageCode));
-  const mediaReference = await buildReceiptMediaReference(
+  const mediaContent = await buildReceiptMediaContent(
     fileInput,
     normalizedMimeType,
     storageUrl
@@ -225,17 +220,8 @@ async function analyzeReceipt(
         },
         {
           role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: 'Attached image: receipt',
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: mediaReference.url,
-              },
-            },
+            content: [
+              ...mediaContent,
             {
               type: 'text',
               text: 'Return the receipt analysis as a single JSON object matching the required keys exactly.',
@@ -246,13 +232,7 @@ async function analyzeReceipt(
       response_format: { type: 'json_object' },
       max_tokens: DEFAULT_QWEN_MAX_OUTPUT_TOKENS,
       extra_body: { enable_thinking: false },
-    }, mediaReference.requiresOssResolve
-      ? {
-          headers: {
-            'X-DashScope-OssResourceResolve': 'enable',
-          },
-        }
-      : undefined);
+    });
   } catch (error) {
     error.message =
       `Qwen receipt analysis request failed for ${normalizedMimeType} (${languageCode}): ${error.message}`;
@@ -309,33 +289,38 @@ function getQwenClient() {
   return cachedClient;
 }
 
-async function buildReceiptMediaReference(fileInput, mimeType, storageUrl = null) {
-  if (storageUrl && mimeType !== 'application/pdf') {
-    return {
-      url: storageUrl,
-      requiresOssResolve: false,
-    };
+async function buildReceiptMediaContent(fileInput, mimeType, storageUrl = null) {
+  if (mimeType !== 'application/pdf') {
+    const imageUrl =
+      storageUrl && typeof storageUrl === 'string'
+        ? storageUrl
+        : await buildSingleImageDataUrl(fileInput, mimeType, storageUrl);
+
+    return [
+      {
+        type: 'text',
+        text: 'Attached image: receipt',
+      },
+      {
+        type: 'image_url',
+        image_url: { url: imageUrl },
+      },
+    ];
   }
 
   const binary = await resolveReceiptBinary(fileInput, storageUrl);
-  if (mimeType === 'application/pdf') {
-    const tempOssUrl = await uploadReceiptToDashScopeTempStorage(binary, {
-      filename:
-        typeof fileInput === 'object' && fileInput?.filename
-          ? fileInput.filename
-          : 'receipt.pdf',
-      mimeType,
-    });
-    return {
-      url: tempOssUrl,
-      requiresOssResolve: true,
-    };
-  }
+  const rasterizedPages = await rasterizePdfToDataUrls(binary);
 
-  return {
-    url: `data:${mimeType};base64,${binary.toString('base64')}`,
-    requiresOssResolve: false,
-  };
+  return rasterizedPages.flatMap((url, index) => [
+    {
+      type: 'text',
+      text: `Attached image: receipt page ${index + 1}`,
+    },
+    {
+      type: 'image_url',
+      image_url: { url },
+    },
+  ]);
 }
 
 function extractQwenText(completion) {
@@ -394,64 +379,41 @@ async function resolveReceiptBinary(fileInput, storageUrl = null) {
   throw new Error('Receipt analysis requires a file buffer or storage URL.');
 }
 
-async function uploadReceiptToDashScopeTempStorage(
-  fileBuffer,
-  { filename = 'receipt.pdf', mimeType = 'application/pdf' } = {}
-) {
-  const apiKey = getQwenApiKey();
-  const model = getQwenVisionModel();
-  const policyResponse = await fetch(
-    `${getQwenHttpApiBaseUrl()}/uploads?action=getPolicy&model=${encodeURIComponent(model)}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    }
-  );
-
-  const policyPayload = await policyResponse.json().catch(async () => ({
-    message: await policyResponse.text(),
-  }));
-
-  if (!policyResponse.ok) {
-    throw new Error(
-      `Unable to get DashScope upload policy: ${policyPayload?.message || policyPayload?.code || policyResponse.status}`
-    );
-  }
-
-  const policyData = policyPayload?.data;
-  if (!policyData?.upload_host || !policyData?.upload_dir || !policyData?.policy) {
-    throw new Error('DashScope upload policy response was incomplete.');
-  }
-
-  const safeFilename = sanitizeFilename(filename);
-  const objectKey = `${policyData.upload_dir}/${safeFilename}`;
-  const form = new FormData();
-  form.set('OSSAccessKeyId', policyData.oss_access_key_id);
-  form.set('Signature', policyData.signature);
-  form.set('policy', policyData.policy);
-  form.set('x-oss-object-acl', policyData.x_oss_object_acl || 'private');
-  form.set('x-oss-forbid-overwrite', 'true');
-  form.set('key', objectKey);
-  form.set('success_action_status', '200');
-  form.set('file', new Blob([fileBuffer], { type: mimeType }), safeFilename);
-
-  const uploadResponse = await fetch(policyData.upload_host, {
-    method: 'POST',
-    body: form,
-  });
-
-  if (!uploadResponse.ok) {
-    throw new Error(
-      `DashScope temporary upload failed with status ${uploadResponse.status}.`
-    );
-  }
-
-  return `oss://${objectKey}`;
+async function buildSingleImageDataUrl(fileInput, mimeType, storageUrl = null) {
+  const binary = await resolveReceiptBinary(fileInput, storageUrl);
+  return `data:${mimeType};base64,${binary.toString('base64')}`;
 }
 
-function sanitizeFilename(filename) {
-  const basename = path.basename(filename).replace(/[^\w.-]+/g, '-');
-  return basename || 'receipt.pdf';
+async function rasterizePdfToDataUrls(pdfBuffer) {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const { createCanvas, Path2D, DOMMatrix, ImageData } = require('@napi-rs/canvas');
+
+  global.Path2D = Path2D;
+  global.DOMMatrix = DOMMatrix;
+  global.ImageData = ImageData;
+
+  const document = await pdfjs.getDocument({
+    data: new Uint8Array(pdfBuffer),
+    useSystemFonts: true,
+  }).promise;
+
+  const pages = [];
+  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+    const page = await document.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: PDF_RASTER_SCALE });
+    const canvas = createCanvas(
+      Math.ceil(viewport.width),
+      Math.ceil(viewport.height)
+    );
+    const context = canvas.getContext('2d');
+
+    await page.render({
+      canvasContext: context,
+      viewport,
+    }).promise;
+
+    pages.push(`data:image/png;base64,${canvas.toBuffer('image/png').toString('base64')}`);
+  }
+
+  return pages;
 }
