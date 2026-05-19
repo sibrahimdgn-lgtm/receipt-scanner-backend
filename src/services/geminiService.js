@@ -3,6 +3,7 @@
  * Sends receipt images or PDFs to Alibaba Qwen for structured data extraction.
  */
 
+const OpenAI = require('openai');
 const {
   DEFAULT_RECEIPT_CATEGORY_KEY,
   getReceiptCategoryLabel,
@@ -15,16 +16,60 @@ const {
 } = require('../config/languages');
 const { normalizeReceiptMimeType } = require('../config/receiptFiles');
 
-const QWEN_RECEIPT_ENDPOINT =
-  'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-const QWEN_RECEIPT_MODEL = 'qwen-vl-plus';
+const DEFAULT_QWEN_BASE_URL =
+  'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
+const DEFAULT_QWEN_VL_MODEL = 'qwen3-vl-plus';
+const DEFAULT_QWEN_TIMEOUT_SECONDS = 120;
+const DEFAULT_QWEN_MAX_RETRIES = 2;
+const DEFAULT_QWEN_MAX_OUTPUT_TOKENS = 8192;
+
+let cachedClient = null;
+let cachedClientSignature = '';
 
 function getQwenApiKey() {
-  return process.env.QWEN_API_KEY?.trim() || null;
+  return (
+    process.env.QWEN_API_KEY?.trim() ||
+    process.env.CREATIVE_QWEN_API_KEY?.trim() ||
+    process.env.DASHSCOPE_API_KEY?.trim() ||
+    null
+  );
 }
 
 function hasQwenApiKey() {
   return Boolean(getQwenApiKey());
+}
+
+function getQwenBaseUrl() {
+  return (
+    process.env.QWEN_BASE_URL?.trim() ||
+    process.env.CREATIVE_QWEN_BASE_URL?.trim() ||
+    DEFAULT_QWEN_BASE_URL
+  );
+}
+
+function getQwenVisionModel() {
+  return (
+    process.env.QWEN_VL_MODEL?.trim() ||
+    process.env.CREATIVE_QWEN_VL_MODEL?.trim() ||
+    DEFAULT_QWEN_VL_MODEL
+  );
+}
+
+function getQwenTimeoutMs() {
+  const seconds = Number(
+    process.env.QWEN_TIMEOUT?.trim() ||
+      process.env.CREATIVE_QWEN_TIMEOUT?.trim() ||
+      DEFAULT_QWEN_TIMEOUT_SECONDS
+  );
+  return Math.max(1, seconds) * 1000;
+}
+
+function getQwenMaxRetries() {
+  return Number(
+    process.env.QWEN_MAX_RETRIES?.trim() ||
+      process.env.CREATIVE_QWEN_MAX_RETRIES?.trim() ||
+      DEFAULT_QWEN_MAX_RETRIES
+  );
 }
 
 function buildReceiptSchema(language = DEFAULT_LANGUAGE) {
@@ -141,7 +186,9 @@ async function analyzeReceipt(
 ) {
   const apiKey = getQwenApiKey();
   if (!apiKey) {
-    throw new Error('Qwen API is not configured. Set QWEN_API_KEY.');
+    throw new Error(
+      'Qwen API is not configured. Set QWEN_API_KEY, CREATIVE_QWEN_API_KEY, or DASHSCOPE_API_KEY.'
+    );
   }
 
   const languageCode = normalizeLanguageCode(language);
@@ -153,44 +200,42 @@ async function analyzeReceipt(
     throw new Error('Unsupported receipt file type for AI analysis.');
   }
 
-  const mediaPayload = await buildReceiptMediaPayload(
-    fileInput,
-    normalizedMimeType,
-    storageUrl
-  );
   const prompt = buildReceiptPrompt(languageCode);
   const schemaGuide = JSON.stringify(buildReceiptSchema(languageCode));
+  const imageUrl = await buildReceiptImageUrl(fileInput, normalizedMimeType, storageUrl);
 
-  let response;
+  let completion;
   try {
-    response = await fetch(QWEN_RECEIPT_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: QWEN_RECEIPT_MODEL,
-        messages: [
-          {
-            role: 'system',
-            content: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
-          },
-          {
-            role: 'user',
-            content: [
-              mediaPayload,
-              {
-                type: 'text',
-                text: 'Return the receipt analysis as a single JSON object matching the required keys exactly.',
-              },
-            ],
-          },
-        ],
-        response_format: {
-          type: 'json_object',
+    completion = await getQwenClient().chat.completions.create({
+      model: getQwenVisionModel(),
+      messages: [
+        {
+          role: 'system',
+          content: `${prompt} Follow this JSON schema guidance exactly: ${schemaGuide}`,
         },
-      }),
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'Attached image: receipt',
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: imageUrl,
+              },
+            },
+            {
+              type: 'text',
+              text: 'Return the receipt analysis as a single JSON object matching the required keys exactly.',
+            },
+          ],
+        },
+      ],
+      response_format: { type: 'json_object' },
+      max_tokens: DEFAULT_QWEN_MAX_OUTPUT_TOKENS,
+      extra_body: { enable_thinking: false },
     });
   } catch (error) {
     error.message =
@@ -198,19 +243,7 @@ async function analyzeReceipt(
     throw error;
   }
 
-  const payload = await response.json().catch(async () => ({
-    message: await response.text(),
-  }));
-
-  if (!response.ok) {
-    throw new Error(
-      `Qwen receipt analysis failed for ${normalizedMimeType} (${languageCode}): ${formatQwenError(
-        payload
-      )}`
-    );
-  }
-
-  const responseText = extractQwenText(payload);
+  const responseText = extractQwenText(completion);
   if (!responseText) {
     throw new Error(
       `Qwen receipt analysis returned an empty response for ${normalizedMimeType} (${languageCode}).`
@@ -232,63 +265,73 @@ module.exports = {
   buildReceiptSchema,
   getQwenApiKey,
   hasQwenApiKey,
+  getQwenBaseUrl,
+  getQwenVisionModel,
 };
 
-async function buildReceiptMediaPayload(fileInput, mimeType, storageUrl = null) {
+function getQwenClient() {
+  const apiKey = getQwenApiKey();
+  if (!apiKey) {
+    throw new Error(
+      'Qwen API is not configured. Set QWEN_API_KEY, CREATIVE_QWEN_API_KEY, or DASHSCOPE_API_KEY.'
+    );
+  }
+
+  const baseURL = getQwenBaseUrl();
+  const signature = `${apiKey}::${baseURL}::${getQwenTimeoutMs()}::${getQwenMaxRetries()}`;
+  if (cachedClient && cachedClientSignature === signature) {
+    return cachedClient;
+  }
+
+  cachedClient = new OpenAI({
+    apiKey,
+    baseURL,
+    timeout: getQwenTimeoutMs(),
+    maxRetries: getQwenMaxRetries(),
+  });
+  cachedClientSignature = signature;
+  return cachedClient;
+}
+
+async function buildReceiptImageUrl(fileInput, mimeType, storageUrl = null) {
   if (storageUrl) {
-    return { type: 'image_url', image_url: { url: storageUrl } };
+    return storageUrl;
   }
 
   const binary = await resolveReceiptBinary(fileInput, storageUrl);
-  const base64File = binary.toString('base64');
-  return {
-    type: 'image_url',
-    image_url: { url: `data:${mimeType};base64,${base64File}` },
-  };
+  return `data:${mimeType};base64,${binary.toString('base64')}`;
 }
 
-function extractQwenText(payload) {
-  const contentBlocks = payload?.choices?.[0]?.message?.content;
-  if (typeof contentBlocks === 'string' && contentBlocks.trim()) {
-    return contentBlocks.trim();
+function extractQwenText(completion) {
+  const content = completion?.choices?.[0]?.message?.content;
+  if (typeof content === 'string' && content.trim()) {
+    return content.trim();
   }
 
-  if (!Array.isArray(contentBlocks)) {
+  if (!Array.isArray(content)) {
     return null;
   }
 
-  const textBlock = contentBlocks.find(
+  const textBlock = content.find(
     (block) => typeof block?.text === 'string' && block.text.trim()
   );
   return textBlock?.text?.trim() || null;
 }
 
-function formatQwenError(payload) {
-  if (typeof payload?.message === 'string' && payload.message.trim()) {
-    return payload.message.trim();
-  }
-
-  if (typeof payload?.error?.message === 'string' && payload.error.message.trim()) {
-    return payload.error.message.trim();
-  }
-
-  if (typeof payload?.code === 'string' && payload.code.trim()) {
-    return payload.code.trim();
-  }
-
-  if (typeof payload?.output?.message === 'string' && payload.output.message.trim()) {
-    return payload.output.message.trim();
-  }
-
-  return 'Unknown Qwen API error.';
-}
-
 function stripJsonCodeFences(text) {
-  return text
+  const stripped = text
     .replace(/^```json\s*/i, '')
     .replace(/^```\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim();
+
+  const firstBrace = stripped.indexOf('{');
+  const lastBrace = stripped.lastIndexOf('}');
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    return stripped.slice(firstBrace, lastBrace + 1);
+  }
+
+  return stripped;
 }
 
 async function resolveReceiptBinary(fileInput, storageUrl = null) {
