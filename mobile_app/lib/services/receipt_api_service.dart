@@ -36,6 +36,8 @@ class ReceiptApiService {
     'jpg',
     'jpeg',
     'png',
+    'heic',
+    'heif',
     'pdf',
   ];
 
@@ -281,6 +283,12 @@ class ReceiptApiService {
     if (mimeType == 'image/webp') {
       return 'image/webp';
     }
+    if (mimeType == 'image/heic') {
+      return 'image/heic';
+    }
+    if (mimeType == 'image/heif') {
+      return 'image/heif';
+    }
 
     final ext = _fileExtension(filename);
     switch (ext) {
@@ -288,6 +296,10 @@ class ReceiptApiService {
         return 'application/pdf';
       case 'png':
         return 'image/png';
+      case 'heic':
+        return 'image/heic';
+      case 'heif':
+        return 'image/heif';
       case 'jpg':
       case 'jpeg':
         return 'image/jpeg';
@@ -306,6 +318,12 @@ class ReceiptApiService {
     if (ext == 'png') {
       return 'receipt.png';
     }
+    if (ext == 'heic') {
+      return 'receipt.heic';
+    }
+    if (ext == 'heif') {
+      return 'receipt.heif';
+    }
     if (ext == 'jpg' || ext == 'jpeg') {
       return 'receipt.$ext';
     }
@@ -314,6 +332,12 @@ class ReceiptApiService {
     }
     if (mimeType == 'image/png') {
       return 'receipt.png';
+    }
+    if (mimeType == 'image/heic') {
+      return 'receipt.heic';
+    }
+    if (mimeType == 'image/heif') {
+      return 'receipt.heif';
     }
     return 'receipt.jpg';
   }

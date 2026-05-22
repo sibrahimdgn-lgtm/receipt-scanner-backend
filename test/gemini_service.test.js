@@ -6,6 +6,7 @@ const {
   getQwenBaseUrl,
   getQwenVisionModel,
   hasQwenApiKey,
+  normalizeVisionImageBinary,
 } = require('../src/services/geminiService');
 
 test('Qwen config helpers reflect the current API key', () => {
@@ -67,4 +68,24 @@ test('Qwen config helpers reflect the current API key', () => {
   } else {
     process.env.CREATIVE_QWEN_VL_MODEL = originalModel;
   }
+});
+
+test('HEIC receipt images are converted to JPEG before Qwen analysis', async () => {
+  const inputBuffer = Buffer.from([1, 2, 3, 4]);
+
+  const normalized = await normalizeVisionImageBinary(
+    inputBuffer,
+    'image/heic',
+    {
+      heicConverter: async ({ buffer, format, quality }) => {
+        assert.deepEqual(buffer, inputBuffer);
+        assert.equal(format, 'JPEG');
+        assert.equal(quality, 0.92);
+        return Uint8Array.from([9, 8, 7]);
+      },
+    }
+  );
+
+  assert.equal(normalized.mimeType, 'image/jpeg');
+  assert.deepEqual(normalized.binary, Buffer.from([9, 8, 7]));
 });

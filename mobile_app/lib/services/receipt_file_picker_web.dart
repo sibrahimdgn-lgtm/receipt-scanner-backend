@@ -90,6 +90,12 @@ String _normalizeMimeType(String rawMimeType, String filename) {
   if (mimeType == 'image/webp') {
     return 'image/webp';
   }
+  if (mimeType == 'image/heic') {
+    return 'image/heic';
+  }
+  if (mimeType == 'image/heif') {
+    return 'image/heif';
+  }
   if (mimeType == 'image/jpeg') {
     return 'image/jpeg';
   }
@@ -103,6 +109,10 @@ String _normalizeMimeType(String rawMimeType, String filename) {
       return 'image/png';
     case 'webp':
       return 'image/webp';
+    case 'heic':
+      return 'image/heic';
+    case 'heif':
+      return 'image/heif';
     case 'jpg':
     case 'jpeg':
     default:

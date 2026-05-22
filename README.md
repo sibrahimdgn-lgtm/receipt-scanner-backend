@@ -13,6 +13,7 @@ Multi-tenant receipt scanning platform with:
 The app can ingest:
 - JPG receipts
 - PNG receipts
+- HEIC / HEIF mobile screenshots and photos
 - PDF e-invoices and digital receipts
 - Live camera captures from the scan screen
 

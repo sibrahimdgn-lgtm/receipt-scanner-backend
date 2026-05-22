@@ -36,7 +36,7 @@ Auth responses return:
 
 - `POST /receipts/scan`
   - multipart field: `receipt`
-  - accepts JPG, PNG, WEBP, and PDF on the backend
+  - accepts JPG, PNG, WEBP, HEIC/HEIF, and PDF on the backend
   - uploads to Firebase Cloud Storage when available; falls back to local `/uploads/...` storage if Cloud Storage upload fails
   - guest calls return parsed data without saving
   - authenticated calls upload the source file to Firebase Cloud Storage and persist the receipt in Firestore

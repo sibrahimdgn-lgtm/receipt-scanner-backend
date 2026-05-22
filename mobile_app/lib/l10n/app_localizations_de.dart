@@ -108,14 +108,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scanReceiptSubtitle =>
-      'Mach ein Foto oder lade JPG, PNG oder PDF hoch und lass die AI die Details extrahieren';
+      'Mach ein Foto oder lade JPG, PNG, HEIC oder PDF hoch und lass die AI die Details extrahieren';
 
   @override
   String get scanUploadOptions => 'Foto aufnehmen oder Belegdatei hochladen';
 
   @override
   String get supportedScanFormats =>
-      'Unterstuetzt gedruckte Belege, E-Rechnungen und digitale Belege in den Formaten JPG, PNG und PDF.';
+      'Unterstuetzt gedruckte Belege, E-Rechnungen und digitale Belege in den Formaten JPG, PNG, HEIC/HEIF und PDF.';
 
   @override
   String get takePhoto => 'Foto aufnehmen';
@@ -124,7 +124,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get openCamera => 'Kamera öffnen';
 
   @override
-  String get uploadReceiptFile => 'JPG, PNG oder PDF hochladen';
+  String get uploadReceiptFile => 'JPG, PNG, HEIC oder PDF hochladen';
 
   @override
   String get cameraAccessTitle => 'Nutze deine Kamera';

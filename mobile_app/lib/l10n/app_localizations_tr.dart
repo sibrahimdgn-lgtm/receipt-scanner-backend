@@ -102,14 +102,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get scanReceiptSubtitle =>
-      'Fotoğraf çek veya JPG, PNG ya da PDF yükle; detayları AI çıkarsın';
+      'Fotoğraf çek veya JPG, PNG, HEIC ya da PDF yükle; detayları AI çıkarsın';
 
   @override
   String get scanUploadOptions => 'Fotoğraf çek veya fiş dosyası yükle';
 
   @override
   String get supportedScanFormats =>
-      'JPG, PNG ve PDF formatındaki basılı fişleri, e-faturaları ve dijital fişleri destekler.';
+      'JPG, PNG, HEIC/HEIF ve PDF formatındaki basılı fişleri, e-faturaları ve dijital fişleri destekler.';
 
   @override
   String get takePhoto => 'Fotoğraf Çek';
@@ -118,7 +118,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get openCamera => 'Kamerayı Aç';
 
   @override
-  String get uploadReceiptFile => 'JPG, PNG veya PDF Yükle';
+  String get uploadReceiptFile => 'JPG, PNG, HEIC veya PDF Yükle';
 
   @override
   String get cameraAccessTitle => 'Kameranı kullan';

@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const { buildReceiptPrompt } = require('../src/services/geminiService');
 const {
   getReceiptUploadMessage,
+  isImageReceiptMimeType,
   isPdfReceiptMimeType,
   normalizeReceiptMimeType,
 } = require('../src/config/receiptFiles');
@@ -17,7 +18,16 @@ test('normalizes PDF receipt uploads from file extension fallback', () => {
     normalizeReceiptMimeType('image/png', 'receipt.png'),
     'image/png'
   );
+  assert.equal(
+    normalizeReceiptMimeType('application/octet-stream', 'receipt.HEIC'),
+    'image/heic'
+  );
+  assert.equal(
+    normalizeReceiptMimeType('image/heif-sequence', 'receipt.heif'),
+    'image/heif'
+  );
   assert.equal(isPdfReceiptMimeType('application/pdf'), true);
+  assert.equal(isImageReceiptMimeType('image/heic'), true);
 });
 
 test('returns localized upload errors for supported backend languages', () => {

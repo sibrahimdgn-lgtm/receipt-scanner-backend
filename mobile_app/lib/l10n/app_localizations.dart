@@ -285,7 +285,7 @@ abstract class AppLocalizations {
   /// No description provided for @scanReceiptSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Take a photo or upload a JPG, PNG, or PDF and let AI extract the details'**
+  /// **'Take a photo or upload a JPG, PNG, HEIC, or PDF and let AI extract the details'**
   String get scanReceiptSubtitle;
 
   /// No description provided for @scanUploadOptions.
@@ -297,7 +297,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportedScanFormats.
   ///
   /// In en, this message translates to:
-  /// **'Supports printed receipts, e-invoices, and digital receipts in JPG, PNG, and PDF formats.'**
+  /// **'Supports printed receipts, e-invoices, and digital receipts in JPG, PNG, HEIC/HEIF, and PDF formats.'**
   String get supportedScanFormats;
 
   /// No description provided for @takePhoto.
@@ -315,7 +315,7 @@ abstract class AppLocalizations {
   /// No description provided for @uploadReceiptFile.
   ///
   /// In en, this message translates to:
-  /// **'Upload JPG, PNG, or PDF'**
+  /// **'Upload JPG, PNG, HEIC, or PDF'**
   String get uploadReceiptFile;
 
   /// No description provided for @cameraAccessTitle.

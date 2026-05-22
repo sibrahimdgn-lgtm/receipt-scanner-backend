@@ -4,6 +4,7 @@
  */
 
 const OpenAI = require('openai');
+const convertHeic = require('heic-convert');
 const {
   DEFAULT_RECEIPT_CATEGORY_KEY,
   getReceiptCategoryLabel,
@@ -263,6 +264,7 @@ module.exports = {
   hasQwenApiKey,
   getQwenBaseUrl,
   getQwenVisionModel,
+  normalizeVisionImageBinary,
 };
 
 function getQwenClient() {
@@ -381,7 +383,31 @@ async function resolveReceiptBinary(fileInput, storageUrl = null) {
 
 async function buildSingleImageDataUrl(fileInput, mimeType, storageUrl = null) {
   const binary = await resolveReceiptBinary(fileInput, storageUrl);
-  return `data:${mimeType};base64,${binary.toString('base64')}`;
+  const normalizedImage = await normalizeVisionImageBinary(binary, mimeType);
+  return `data:${normalizedImage.mimeType};base64,${normalizedImage.binary.toString('base64')}`;
+}
+
+async function normalizeVisionImageBinary(
+  binary,
+  mimeType,
+  { heicConverter = convertHeic } = {}
+) {
+  if (mimeType !== 'image/heic' && mimeType !== 'image/heif') {
+    return { binary, mimeType };
+  }
+
+  const converted = await heicConverter({
+    buffer: binary,
+    format: 'JPEG',
+    quality: 0.92,
+  });
+
+  return {
+    binary: Buffer.isBuffer(converted)
+      ? converted
+      : Buffer.from(converted),
+    mimeType: 'image/jpeg',
+  };
 }
 
 async function rasterizePdfToDataUrls(pdfBuffer) {

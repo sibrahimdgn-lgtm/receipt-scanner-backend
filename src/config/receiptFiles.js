@@ -5,7 +5,14 @@ const RECEIPT_EXTENSION_TO_MIME = {
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
   '.webp': 'image/webp',
+  '.heic': 'image/heic',
+  '.heif': 'image/heif',
   '.pdf': 'application/pdf',
+};
+
+const RECEIPT_MIME_ALIASES = {
+  'image/heic-sequence': 'image/heic',
+  'image/heif-sequence': 'image/heif',
 };
 
 const SUPPORTED_RECEIPT_MIME_TYPES = Array.from(
@@ -40,8 +47,10 @@ function getReceiptExtension(filename = '') {
 
 function normalizeReceiptMimeType(mimeType, filename = '') {
   const normalizedMimeType = mimeType?.toString().trim().toLowerCase();
-  if (SUPPORTED_RECEIPT_MIME_TYPES.includes(normalizedMimeType)) {
-    return normalizedMimeType;
+  const canonicalMimeType =
+    RECEIPT_MIME_ALIASES[normalizedMimeType] || normalizedMimeType;
+  if (SUPPORTED_RECEIPT_MIME_TYPES.includes(canonicalMimeType)) {
+    return canonicalMimeType;
   }
 
   const extension = getReceiptExtension(filename);

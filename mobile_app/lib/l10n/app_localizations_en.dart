@@ -103,14 +103,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanReceiptSubtitle =>
-      'Take a photo or upload a JPG, PNG, or PDF and let AI extract the details';
+      'Take a photo or upload a JPG, PNG, HEIC, or PDF and let AI extract the details';
 
   @override
   String get scanUploadOptions => 'Take a photo or upload a receipt file';
 
   @override
   String get supportedScanFormats =>
-      'Supports printed receipts, e-invoices, and digital receipts in JPG, PNG, and PDF formats.';
+      'Supports printed receipts, e-invoices, and digital receipts in JPG, PNG, HEIC/HEIF, and PDF formats.';
 
   @override
   String get takePhoto => 'Take Photo';
@@ -119,7 +119,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openCamera => 'Open Camera';
 
   @override
-  String get uploadReceiptFile => 'Upload JPG, PNG, or PDF';
+  String get uploadReceiptFile => 'Upload JPG, PNG, HEIC, or PDF';
 
   @override
   String get cameraAccessTitle => 'Use your camera';

@@ -102,14 +102,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get scanReceiptSubtitle =>
-      'التقط صورة أو ارفع ملف JPG أو PNG أو PDF ودع الذكاء الاصطناعي يستخرج التفاصيل';
+      'التقط صورة أو ارفع ملف JPG أو PNG أو HEIC أو PDF ودع الذكاء الاصطناعي يستخرج التفاصيل';
 
   @override
   String get scanUploadOptions => 'التقط صورة أو ارفع ملف إيصال';
 
   @override
   String get supportedScanFormats =>
-      'يدعم الإيصالات المطبوعة والفواتير الإلكترونية والإيصالات الرقمية بصيغ JPG وPNG وPDF.';
+      'يدعم الإيصالات المطبوعة والفواتير الإلكترونية والإيصالات الرقمية بصيغ JPG وPNG وHEIC/HEIF وPDF.';
 
   @override
   String get takePhoto => 'التقط صورة';
@@ -118,7 +118,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get openCamera => 'افتح الكاميرا';
 
   @override
-  String get uploadReceiptFile => 'ارفع JPG أو PNG أو PDF';
+  String get uploadReceiptFile => 'ارفع JPG أو PNG أو HEIC أو PDF';
 
   @override
   String get cameraAccessTitle => 'استخدم الكاميرا';

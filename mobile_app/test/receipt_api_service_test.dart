@@ -68,6 +68,27 @@ void main() {
       expect(prepared.filename, 'receipt.pdf');
       expect(prepared.mimeType, 'application/pdf');
     });
+
+    test('heic uploads preserve HEIC metadata when web compression fails',
+        () async {
+      final originalBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+      final file = ReceiptSelection(
+        bytes: originalBytes,
+        filename: 'mobile-shot.HEIC',
+        mimeType: 'image/heic',
+      );
+
+      final prepared = await ReceiptApiService.instance.prepareUploadPayload(
+        file,
+        isWebOverride: true,
+        webCompressor: (_) async =>
+            throw const FormatException('heic compression unsupported'),
+      );
+
+      expect(prepared.bytes, originalBytes);
+      expect(prepared.filename, 'receipt.heic');
+      expect(prepared.mimeType, 'image/heic');
+    });
   });
 
   group('ReceiptApiService.pickReceiptFile', () {
