@@ -131,7 +131,7 @@ function getPeriodRange(
     case 'daily':
     default:
       return {
-        start: shiftUtcDate(today, { days: -6 }),
+        start: today,
         end: today,
       };
   }

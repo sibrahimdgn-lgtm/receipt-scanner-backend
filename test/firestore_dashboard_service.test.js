@@ -129,6 +129,32 @@ test('daily range uses the client local calendar day for west-of-UTC timezones',
     -420
   );
 
-  assert.equal(range.start.toISOString(), '2026-05-06T00:00:00.000Z');
+  assert.equal(range.start.toISOString(), '2026-05-12T00:00:00.000Z');
   assert.equal(range.end.toISOString(), '2026-05-12T00:00:00.000Z');
+});
+
+test('daily summary does not include receipts from previous local days', () => {
+  const receipts = [
+    {
+      receipt_id: 'r-old',
+      receipt_date: '2026-05-18',
+      vendor_name: 'Old Receipt',
+      currency_code: 'TRY',
+      total_amount: 6398.4,
+      line_items: [],
+    },
+  ];
+
+  const summary = buildDashboardSummary({
+    receipts,
+    period: 'daily',
+    shopCurrencyCode: 'TRY',
+    language: 'tr',
+    now: new Date('2026-05-22T09:00:00.000Z'),
+    timezoneOffsetMinutes: 180,
+  });
+
+  assert.equal(summary.summary.receipt_count, 0);
+  assert.equal(summary.summary.total_spend, 0);
+  assert.deepEqual(summary.trend, []);
 });
